@@ -1,0 +1,13 @@
+{
+  "name": "@castaway/schemas",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./src/api.ts",
+  "types": "./src/api.ts",
+  "dependencies": {
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
