@@ -68,6 +68,12 @@ export const seasons = pgTable('seasons', {
   dayIndex: integer('day_index').notNull().default(0),
   totalDays: integer('total_days').notNull().default(15),
   mergeAt: integer('merge_at').notNull().default(12), // Merge when 12 players remain
+  // Custom game settings
+  fastForwardMode: boolean('fast_forward_mode').notNull().default(false),
+  statDecayMultiplier: real('stat_decay_multiplier').notNull().default(1.0), // 0.5 = easier, 2.0 = harder
+  advantageSpawnRate: real('advantage_spawn_rate').notNull().default(1.0), // 1.0 = normal, 2.0 = more advantages
+  weatherIntensity: real('weather_intensity').notNull().default(1.0), // 1.0 = normal, 0.5 = milder, 2.0 = more extreme
+  randomEventChance: real('random_event_chance').notNull().default(1.0), // Multiplier for random event probability
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
@@ -367,10 +373,34 @@ export const confessionalInsights = pgTable('confessional_insights', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// Career stats table (tracks player performance across all seasons)
+export const careerStats = pgTable('career_stats', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  gamesPlayed: integer('games_played').notNull().default(0),
+  wins: integer('wins').notNull().default(0),
+  finalThree: integer('final_three').notNull().default(0),
+  juryAppearances: integer('jury_appearances').notNull().default(0),
+  advantagesFound: integer('advantages_found').notNull().default(0),
+  advantagesPlayed: integer('advantages_played').notNull().default(0),
+  alliancesFormed: integer('alliances_formed').notNull().default(0),
+  challengesWon: integer('challenges_won').notNull().default(0),
+  daysPlayed: integer('days_played').notNull().default(0),
+  votesReceived: integer('votes_received').notNull().default(0),
+  votesCast: integer('votes_cast').notNull().default(0),
+  confessionalsMade: integer('confessionals_made').notNull().default(0),
+  totalInsightPoints: integer('total_insight_points').notNull().default(0),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
 // Relations (same as before, updated where needed)
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ many, one }) => ({
   players: many(players),
   pushSubscriptions: many(pushSubscriptions),
+  careerStats: one(careerStats, {
+    fields: [users.id],
+    references: [careerStats.userId],
+  }),
 }));
 
 export const seasonsRelations = relations(seasons, ({ many }) => ({
@@ -652,5 +682,12 @@ export const confessionalInsightsRelations = relations(confessionalInsights, ({ 
   player: one(players, {
     fields: [confessionalInsights.playerId],
     references: [players.id],
+  }),
+}));
+
+export const careerStatsRelations = relations(careerStats, ({ one }) => ({
+  user: one(users, {
+    fields: [careerStats.userId],
+    references: [users.id],
   }),
 }));

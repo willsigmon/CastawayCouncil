@@ -1,8 +1,9 @@
 import { db } from '../../drizzle/db';
-import { seasons, players, events, stats, challenges, votes, tribeMembers, weatherEvents, randomEvents, rumors, secretMissions } from '../../drizzle/schema';
+import { seasons, players, events, stats, challenges, challengeResults, votes, tribeMembers, tribes, weatherEvents, randomEvents, rumors, secretMissions } from '../../drizzle/schema';
 import { eq, and, isNull } from 'drizzle-orm';
 import { generateServerSeed, generateRoll } from '../../packages/game-logic/src/rng';
 import { tallyVotes } from '../../packages/game-logic/src/voting';
+import { calculateScore } from '../../packages/game-logic/src/scoring';
 import { generateDailyWeather } from '../../packages/game-logic/src/weather';
 import { shouldTriggerRandomEvent, generateRandomEvent } from '../../packages/game-logic/src/random-events';
 import { generateRumor, generateContextualRumor } from '../../packages/game-logic/src/rumors';
@@ -27,6 +28,7 @@ export interface ScoreChallengeInput {
 
 export interface ScoreChallengeResult {
   winningTribeId: string | null;
+  winningPlayerId: string | null;
 }
 
 export interface TallyVotesInput {
@@ -125,40 +127,169 @@ export async function createDayStatsActivity(input: CreateDayStatsInput): Promis
 export async function scoreChallengeActivity(input: ScoreChallengeInput): Promise<ScoreChallengeResult> {
   const { seasonId, day } = input;
 
-  // For now, simplified: pick a random tribe as winner
-  // In a real implementation, you'd use the commit-reveal protocol
-
-  const seasonTribes = await db.query.tribes.findMany({
-    where: eq(players.seasonId, seasonId),
+  // Get the challenge for this day
+  const challenge = await db.query.challenges.findFirst({
+    where: and(eq(challenges.seasonId, seasonId), eq(challenges.day, day)),
     with: {
-      members: {
-        with: {
-          player: true
-        }
-      }
-    }
-  });
-
-  if (seasonTribes.length === 0) {
-    return { winningTribeId: null };
-  }
-
-  // Simple random winner for now
-  const winnerIndex = Math.floor(Math.random() * seasonTribes.length);
-  const winningTribeId = seasonTribes[winnerIndex]?.id ?? null;
-
-  // Emit challenge result event
-  await db.insert(events).values({
-    seasonId,
-    day,
-    kind: 'phase_close',
-    payloadJson: {
-      phase: 'challenge',
-      winningTribeId
+      submissions: true,
     },
   });
 
-  return { winningTribeId };
+  if (!challenge) {
+    console.log(`No challenge found for day ${day}`);
+    return { winningTribeId: null, winningPlayerId: null };
+  }
+
+  // Check if merge has occurred
+  const mergeCheck = await db.query.seasons.findFirst({
+    where: eq(seasons.id, seasonId),
+  });
+  const isMerged = (mergeCheck?.mergedAt !== null);
+
+  if (isMerged) {
+    // Individual immunity - score individual players
+    const playerScores: Array<{ playerId: string; score: number }> = [];
+
+    for (const submission of challenge.submissions) {
+      if (submission.subjectType !== 'player') continue;
+
+      // Get player stats
+      const playerStats = await db.query.stats.findFirst({
+        where: and(eq(stats.playerId, submission.subjectId), eq(stats.day, day)),
+      });
+
+      if (!playerStats) continue;
+
+      // Calculate score with performance fatigue
+      const roll = (submission.submissionData as any).roll || Math.floor(Math.random() * 20) + 1;
+      const scoreResult = calculateScore(
+        roll,
+        {
+          energy: playerStats.energy,
+          hunger: playerStats.hunger,
+          thirst: playerStats.thirst,
+          comfort: playerStats.comfort,
+          social: playerStats.social,
+        },
+        {
+          energy: 0,
+          hunger: 0,
+          thirst: 0,
+          itemBonus: (submission.submissionData as any).itemBonus || 0,
+          eventBonus: 0,
+          debuffs: [],
+        }
+      );
+
+      playerScores.push({ playerId: submission.subjectId, score: scoreResult.total });
+
+      // Save result
+      await db.insert(challengeResults).values({
+        challengeId: challenge.id,
+        subjectType: 'player',
+        subjectId: submission.subjectId,
+        score: scoreResult.total,
+        metadata: { breakdown: scoreResult.breakdown },
+      });
+    }
+
+    // Find winner
+    const winner = playerScores.sort((a, b) => b.score - a.score)[0];
+
+    // Emit challenge result event
+    await db.insert(events).values({
+      seasonId,
+      day,
+      kind: 'phase_close',
+      payloadJson: {
+        phase: 'challenge',
+        winningPlayerId: winner?.playerId,
+      },
+    });
+
+    return { winningTribeId: null, winningPlayerId: winner?.playerId || null };
+  } else {
+    // Tribe immunity - score tribes
+    const seasonTribes = await db.query.tribes.findMany({
+      where: eq(tribes.seasonId, seasonId),
+      with: {
+        members: {
+          with: {
+            player: true,
+          },
+        },
+      },
+    });
+
+    const tribeScores: Array<{ tribeId: string; score: number }> = [];
+
+    for (const tribe of seasonTribes) {
+      let tribeTotal = 0;
+      let participantCount = 0;
+
+      for (const member of tribe.members) {
+        // Get player stats
+        const playerStats = await db.query.stats.findFirst({
+          where: and(eq(stats.playerId, member.playerId), eq(stats.day, day)),
+        });
+
+        if (!playerStats) continue;
+
+        // Calculate score with performance fatigue
+        const roll = Math.floor(Math.random() * 20) + 1;
+        const scoreResult = calculateScore(
+          roll,
+          {
+            energy: playerStats.energy,
+            hunger: playerStats.hunger,
+            thirst: playerStats.thirst,
+            comfort: playerStats.comfort,
+            social: playerStats.social,
+          },
+          {
+            energy: 0,
+            hunger: 0,
+            thirst: 0,
+            itemBonus: 0,
+            eventBonus: 0,
+            debuffs: [],
+          }
+        );
+
+        tribeTotal += scoreResult.total;
+        participantCount++;
+      }
+
+      if (participantCount > 0) {
+        tribeScores.push({ tribeId: tribe.id, score: tribeTotal });
+
+        // Save tribe result
+        await db.insert(challengeResults).values({
+          challengeId: challenge.id,
+          subjectType: 'tribe',
+          subjectId: tribe.id,
+          score: tribeTotal,
+          metadata: { participants: participantCount },
+        });
+      }
+    }
+
+    // Find winner
+    const winner = tribeScores.sort((a, b) => b.score - a.score)[0];
+
+    // Emit challenge result event
+    await db.insert(events).values({
+      seasonId,
+      day,
+      kind: 'phase_close',
+      payloadJson: {
+        phase: 'challenge',
+        winningTribeId: winner?.tribeId,
+      },
+    });
+
+    return { winningTribeId: winner?.tribeId || null, winningPlayerId: null };
+  }
 }
 
 /**

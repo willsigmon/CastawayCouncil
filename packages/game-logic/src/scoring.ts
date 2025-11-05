@@ -19,6 +19,7 @@ export interface PlayerStats {
   energy: number;
   hunger: number;
   thirst: number;
+  comfort: number;
   social: number;
 }
 
@@ -67,6 +68,31 @@ export function applyDebuffs(debuffs: string[]): number {
 }
 
 /**
+ * Calculate performance fatigue multiplier based on energy and comfort
+ * Poor stats reduce challenge performance
+ *
+ * @returns multiplier between 0.70 and 1.00
+ */
+export function calculatePerformanceFatigue(energy: number, comfort: number): {
+  multiplier: number;
+  penalty: number;
+  description: string;
+} {
+  const avgStat = (energy + comfort) / 2;
+
+  if (avgStat >= 70) {
+    return { multiplier: 1.0, penalty: 0, description: 'Peak performance' };
+  }
+  if (avgStat >= 50) {
+    return { multiplier: 0.95, penalty: 5, description: 'Slightly fatigued' };
+  }
+  if (avgStat >= 30) {
+    return { multiplier: 0.85, penalty: 15, description: 'Fatigued' };
+  }
+  return { multiplier: 0.70, penalty: 30, description: 'Severely fatigued' };
+}
+
+/**
  * Calculate final challenge score
  */
 export function calculateScore(roll: number, stats: PlayerStats, modifier: Modifier): ChallengeScore {
@@ -105,6 +131,14 @@ export function calculateScore(roll: number, stats: PlayerStats, modifier: Modif
   if (debuffPenalty < 0) {
     breakdown.push(`Debuffs: ${debuffPenalty}`);
     total += debuffPenalty;
+  }
+
+  // Apply performance fatigue based on energy and comfort
+  const fatigue = calculatePerformanceFatigue(stats.energy, stats.comfort);
+  if (fatigue.penalty > 0) {
+    const beforeFatigue = total;
+    total = Math.floor(total * fatigue.multiplier);
+    breakdown.push(`Performance fatigue (${fatigue.description}): ${beforeFatigue} × ${fatigue.multiplier} = ${total}`);
   }
 
   // Minimum score of 1

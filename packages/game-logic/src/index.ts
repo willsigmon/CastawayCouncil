@@ -10,3 +10,5 @@ export * from './crafting';
 export * from './secret-missions';
 export * from './trust-meter';
 export * from './rumors';
+export * from './confessionals';
+export * from './career-stats';
