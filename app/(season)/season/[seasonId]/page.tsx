@@ -1,7 +1,8 @@
 import { db } from '@/drizzle/db';
 import { seasons, players, stats, tribeMembers, tribes, events } from '@/drizzle/schema';
 import { eq, and, isNull, desc } from 'drizzle-orm';
-import { StatBar } from '@/app/_components/stat-bar';
+import { StatsGrid } from '@/app/_components/stat-bar';
+import { ClassBadge } from '@/app/_components/class-badge';
 import { PhaseIndicator } from '@/app/_components/phase-indicator';
 import { TaskActions } from './task-actions';
 
@@ -81,7 +82,16 @@ export default async function SeasonDashboard({ params }: PageProps) {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
             <div className="flex items-start justify-between">
               <div>
-                <h2 className="text-2xl font-bold">{player?.displayName}</h2>
+                <div className="flex items-center gap-3 mb-2">
+                  <h2 className="text-2xl font-bold">{player?.displayName}</h2>
+                  {player?.playerClass && (
+                    <ClassBadge
+                      playerClass={player.playerClass as any}
+                      wildcardAbility={player.wildcardAbility as any}
+                      size="md"
+                    />
+                  )}
+                </div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   @{player?.user.handle}
                 </p>
@@ -103,42 +113,28 @@ export default async function SeasonDashboard({ params }: PageProps) {
           </div>
 
           {/* Stats */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 space-y-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
             <h3 className="text-xl font-bold mb-4">Your Stats</h3>
             {currentStats ? (
-              <>
-                <StatBar
-                  label="Energy"
-                  value={currentStats.energy}
-                  max={100}
-                  color="energy"
-                />
-                <StatBar
-                  label="Hunger"
-                  value={currentStats.hunger}
-                  max={100}
-                  color="hunger"
-                />
-                <StatBar
-                  label="Thirst"
-                  value={currentStats.thirst}
-                  max={100}
-                  color="thirst"
-                />
-                <StatBar
-                  label="Social"
-                  value={currentStats.social}
-                  max={100}
-                  color="social"
-                />
-              </>
+              <StatsGrid
+                hunger={currentStats.hunger}
+                thirst={currentStats.thirst}
+                comfort={currentStats.comfort}
+                energy={currentStats.energy}
+                medicalAlert={currentStats.medicalAlert}
+              />
             ) : (
               <p className="text-gray-500">No stats available for today</p>
             )}
           </div>
 
           {/* Task Actions */}
-          <TaskActions playerId={mockPlayerId} currentPhase={currentPhase} />
+          <TaskActions
+            playerId={mockPlayerId}
+            currentPhase={currentPhase}
+            playerClass={player?.playerClass || undefined}
+            wildcardAbility={player?.wildcardAbility || undefined}
+          />
         </div>
 
         {/* Right Column: Tribe Info & Recent Events */}
@@ -160,25 +156,28 @@ export default async function SeasonDashboard({ params }: PageProps) {
             </h3>
             {currentPhase === 'camp' && (
               <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1 list-disc list-inside">
-                <li>Forage for food to restore hunger</li>
-                <li>Gather water (watch for tainted water!)</li>
-                <li>Rest to restore energy</li>
-                <li>Help allies to build social bonds</li>
+                <li>Gather resources for your tribe (firewood, coconuts, fish)</li>
+                <li>Build shelter to improve comfort</li>
+                <li>Get water and cook food to maintain stats</li>
+                <li>Search for advantages (33% find rate, 2 per camp)</li>
+                <li>Watch your stats - medical evac at total ≤50!</li>
+                <li>Rest or meditate to recover energy</li>
               </ul>
             )}
             {currentPhase === 'challenge' && (
               <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1 list-disc list-inside">
-                <li>Commit your seed before the deadline</li>
-                <li>Higher energy = better rolls</li>
-                <li>Team scores use top player rolls</li>
-                <li>Winning tribe gets immunity</li>
+                <li>Text-based challenges require coordination</li>
+                <li>Your class abilities can help (Strategist gets hints!)</li>
+                <li>Team scores combine all submissions</li>
+                <li>Winning tribe gets immunity from tribal council</li>
               </ul>
             )}
             {currentPhase === 'vote' && (
               <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1 list-disc list-inside">
                 <li>Vote for who you want eliminated</li>
                 <li>You can change your vote until deadline</li>
-                <li>Immunity idols negate votes</li>
+                <li>Play advantages: immunity, vote steal, extra vote</li>
+                <li>Advantages respawn after use (2 per camp)</li>
                 <li>Losing tribe votes someone out</li>
               </ul>
             )}
@@ -208,10 +207,19 @@ async function TribeRoster({ tribeId, seasonId }: { tribeId: string; seasonId: s
       {activemembers.map((member) => (
         <div
           key={member.id}
-          className="flex items-center justify-between p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700"
+          className="flex items-center justify-between p-3 rounded hover:bg-gray-50 dark:hover:bg-gray-700 border border-transparent hover:border-gray-200 dark:hover:border-gray-600 transition-all"
         >
-          <div>
-            <p className="font-medium">{member.player.displayName}</p>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <p className="font-medium">{member.player.displayName}</p>
+              {member.player.playerClass && (
+                <ClassBadge
+                  playerClass={member.player.playerClass as any}
+                  wildcardAbility={member.player.wildcardAbility as any}
+                  size="sm"
+                />
+              )}
+            </div>
             <p className="text-xs text-gray-500">@{member.player.user.handle}</p>
           </div>
           <div className="w-3 h-3 rounded-full bg-green-500" title="Active" />
