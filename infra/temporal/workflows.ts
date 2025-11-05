@@ -11,6 +11,10 @@ const {
   applyStatDecayActivity,
   checkMedicalEvacsActivity,
   runFinaleActivity,
+  generateDailyWeatherActivity,
+  triggerRandomEventsActivity,
+  generateDailyRumorsActivity,
+  assignDailyMissionsActivity,
 } = proxyActivities<typeof activities>({
   startToCloseTimeout: '5 minutes',
   retry: {
@@ -62,6 +66,18 @@ export async function seasonWorkflow(input: SeasonWorkflowInput): Promise<void> 
     // Create stats for new day and apply decay
     await createDayStatsActivity({ seasonId, day });
     await applyStatDecayActivity({ seasonId, day });
+
+    // Generate daily weather
+    await generateDailyWeatherActivity({ seasonId, day });
+
+    // Trigger random events (15-35% chance based on day)
+    await triggerRandomEventsActivity({ seasonId, day });
+
+    // Generate daily rumors (1-3 per day)
+    await generateDailyRumorsActivity({ seasonId, day });
+
+    // Assign secret missions to 30-50% of players
+    await assignDailyMissionsActivity({ seasonId, day });
 
     // Check for medical evacuations (players with total stats ≤ 50)
     const medicalEvacs = await checkMedicalEvacsActivity({ seasonId, day });

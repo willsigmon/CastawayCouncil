@@ -1,8 +1,12 @@
 import { db } from '../../drizzle/db';
-import { seasons, players, events, stats, challenges, votes, tribeMembers } from '../../drizzle/schema';
+import { seasons, players, events, stats, challenges, votes, tribeMembers, weatherEvents, randomEvents, rumors, secretMissions } from '../../drizzle/schema';
 import { eq, and, isNull } from 'drizzle-orm';
 import { generateServerSeed, generateRoll } from '../../packages/game-logic/src/rng';
 import { tallyVotes } from '../../packages/game-logic/src/voting';
+import { generateDailyWeather } from '../../packages/game-logic/src/weather';
+import { shouldTriggerRandomEvent, generateRandomEvent } from '../../packages/game-logic/src/random-events';
+import { generateRumor, generateContextualRumor } from '../../packages/game-logic/src/rumors';
+import { generateSecretMission } from '../../packages/game-logic/src/secret-missions';
 
 export interface PhaseEventInput {
   seasonId: string;
@@ -459,4 +463,272 @@ export async function runFinaleActivity(input: RunFinaleInput): Promise<void> {
   await db.update(seasons).set({ status: 'complete' }).where(eq(seasons.id, seasonId));
 
   console.log(`Finale completed. Season ${seasonId} is now complete.`);
+}
+
+/**
+ * Generate daily weather
+ */
+export interface GenerateWeatherInput {
+  seasonId: string;
+  day: number;
+}
+
+export async function generateDailyWeatherActivity(input: GenerateWeatherInput): Promise<void> {
+  const { seasonId, day } = input;
+
+  console.log(`Generating weather for season ${seasonId} day ${day}`);
+
+  // Generate weather
+  const weather = generateDailyWeather(day);
+
+  // Save to database
+  await db.insert(weatherEvents).values({
+    seasonId,
+    day,
+    weatherType: weather.weatherType,
+    severity: weather.severity,
+    hungerModifier: weather.hungerModifier,
+    thirstModifier: weather.thirstModifier,
+    comfortModifier: weather.comfortModifier,
+    description: weather.description,
+  });
+
+  // Emit weather change event
+  await db.insert(events).values({
+    seasonId,
+    day,
+    kind: 'weather_change',
+    payloadJson: {
+      weatherType: weather.weatherType,
+      severity: weather.severity,
+      description: weather.description,
+    },
+  });
+
+  console.log(`Weather generated: ${weather.weatherType} (severity ${weather.severity})`);
+}
+
+/**
+ * Trigger random events
+ */
+export interface TriggerRandomEventsInput {
+  seasonId: string;
+  day: number;
+}
+
+export async function triggerRandomEventsActivity(input: TriggerRandomEventsInput): Promise<void> {
+  const { seasonId, day } = input;
+
+  // Check if we should trigger a random event
+  if (!shouldTriggerRandomEvent(day)) {
+    console.log(`No random event triggered for day ${day}`);
+    return;
+  }
+
+  // Get context
+  const activePlayers = await db.query.players.findMany({
+    where: and(eq(players.seasonId, seasonId), isNull(players.eliminatedAt)),
+  });
+
+  const allTribes = await db.query.tribes.findMany({
+    where: eq(tribeMembers.tribeId, seasonId),
+  });
+
+  const context = {
+    players: activePlayers.map((p) => ({ id: p.id, name: p.displayName })),
+    recentEvents: [],
+    tribeIds: allTribes.map((t) => t.id),
+  };
+
+  // Generate random event
+  const event = generateRandomEvent(day);
+
+  // Determine target
+  let targetId: string;
+  if (event.targetType === 'player') {
+    const randomPlayer = activePlayers[Math.floor(Math.random() * activePlayers.length)];
+    targetId = randomPlayer!.id;
+  } else {
+    const randomTribe = allTribes[Math.floor(Math.random() * allTribes.length)];
+    targetId = randomTribe!.id;
+  }
+
+  // Save to database
+  await db.insert(randomEvents).values({
+    seasonId,
+    day,
+    eventType: event.eventType,
+    targetType: event.targetType,
+    targetId,
+    description: event.description,
+    effects: event.effects,
+  });
+
+  // Emit event
+  await db.insert(events).values({
+    seasonId,
+    day,
+    kind: 'random_event',
+    payloadJson: {
+      eventType: event.eventType,
+      targetType: event.targetType,
+      targetId,
+      description: event.description,
+    },
+  });
+
+  console.log(`Random event: ${event.eventType} affecting ${event.targetType} ${targetId}`);
+}
+
+/**
+ * Generate daily rumors
+ */
+export interface GenerateRumorsInput {
+  seasonId: string;
+  day: number;
+}
+
+export async function generateDailyRumorsActivity(input: GenerateRumorsInput): Promise<void> {
+  const { seasonId, day } = input;
+
+  console.log(`Generating rumors for season ${seasonId} day ${day}`);
+
+  // Get context
+  const activePlayers = await db.query.players.findMany({
+    where: and(eq(players.seasonId, seasonId), isNull(players.eliminatedAt)),
+  });
+
+  const allTribes = await db.query.tribes.findMany({
+    where: eq(tribes.seasonId, seasonId),
+  });
+
+  const context = {
+    players: activePlayers.map((p) => ({ id: p.id, name: p.displayName })),
+    recentEvents: [],
+    tribeIds: allTribes.map((t) => t.id),
+  };
+
+  // Generate 1-3 rumors per day
+  const rumorCount = 1 + Math.floor(Math.random() * 3);
+
+  for (let i = 0; i < rumorCount; i++) {
+    const rumor = generateRumor(day, context);
+
+    // Calculate expiration date
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + rumor.expiresInDays);
+
+    // Save to database
+    await db.insert(rumors).values({
+      seasonId,
+      day,
+      content: rumor.content,
+      truthful: rumor.truthful,
+      targetPlayerId: rumor.targetPlayerId || null,
+      visibleTo: rumor.visibleTo,
+      expiresAt,
+    });
+
+    // Emit rumor event
+    await db.insert(events).values({
+      seasonId,
+      day,
+      kind: 'rumor_started',
+      payloadJson: {
+        content: rumor.content,
+        truthful: rumor.truthful,
+        impact: rumor.impact,
+      },
+    });
+  }
+
+  console.log(`Generated ${rumorCount} rumors for day ${day}`);
+}
+
+/**
+ * Assign secret missions to random players
+ */
+export interface AssignMissionsInput {
+  seasonId: string;
+  day: number;
+}
+
+export async function assignDailyMissionsActivity(input: AssignMissionsInput): Promise<void> {
+  const { seasonId, day } = input;
+
+  console.log(`Assigning missions for season ${seasonId} day ${day}`);
+
+  // Get active players
+  const activePlayers = await db.query.players.findMany({
+    where: and(eq(players.seasonId, seasonId), isNull(players.eliminatedAt)),
+    with: {
+      tribeMembers: {
+        with: {
+          tribe: true,
+        },
+      },
+    },
+  });
+
+  // Assign mission to 30-50% of players
+  const missionChance = 0.3 + Math.random() * 0.2;
+
+  for (const player of activePlayers) {
+    if (Math.random() > missionChance) continue;
+
+    // Get context for mission generation
+    const tribeMates =
+      player.tribeMembers[0]?.tribe
+        ? activePlayers
+            .filter(
+              (p) =>
+                p.tribeMembers[0]?.tribe?.id === player.tribeMembers[0]?.tribe?.id &&
+                p.id !== player.id
+            )
+            .map((p) => p.id)
+        : [];
+
+    const rivals = activePlayers
+      .filter((p) => p.id !== player.id && !tribeMates.includes(p.id))
+      .map((p) => p.id);
+
+    const context = {
+      tribemates: tribeMates,
+      rivals,
+      currentAlliances: [], // TODO: Get from relationships table
+    };
+
+    // Generate mission
+    const mission = generateSecretMission(player.id, day, context);
+
+    // Calculate expiration date
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + mission.expiresInDays);
+
+    // Save to database
+    await db.insert(secretMissions).values({
+      playerId: player.id,
+      seasonId,
+      day,
+      title: mission.title,
+      description: mission.description,
+      objective: mission.objective,
+      reward: mission.reward,
+      status: 'assigned',
+      expiresAt,
+    });
+
+    // Emit mission assigned event
+    await db.insert(events).values({
+      seasonId,
+      day,
+      kind: 'secret_mission_assigned',
+      payloadJson: {
+        playerId: player.id,
+        missionType: mission.objective.type,
+      },
+    });
+  }
+
+  console.log(`Assigned missions to players for day ${day}`);
 }
