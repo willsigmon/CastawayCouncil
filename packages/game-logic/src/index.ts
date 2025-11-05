@@ -5,3 +5,8 @@ export * from './classes';
 export * from './camp-actions';
 export * from './weather';
 export * from './camp-upgrades';
+export * from './random-events';
+export * from './crafting';
+export * from './secret-missions';
+export * from './trust-meter';
+export * from './rumors';
