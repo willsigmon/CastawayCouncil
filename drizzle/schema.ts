@@ -28,7 +28,26 @@ export const eventKindEnum = pgEnum('event_kind', [
   'merge',
   'medical_evac',
   'finale',
+  'weather_change',
+  'random_event',
+  'camp_upgrade',
+  'crafting',
+  'secret_mission_assigned',
+  'secret_mission_completed',
+  'rumor_started',
 ]);
+export const weatherTypeEnum = pgEnum('weather_type', ['sunny', 'rain', 'heat', 'storm', 'cold']);
+export const upgradeTypeEnum = pgEnum('upgrade_type', ['shelter', 'fire', 'trap', 'tool_station', 'water_filter', 'storage']);
+export const randomEventTypeEnum = pgEnum('random_event_type', [
+  'injury',
+  'animal_encounter',
+  'lost_supplies',
+  'mysterious_clue',
+  'supply_drop',
+  'tribal_visit',
+  'food_spoilage',
+]);
+export const missionStatusEnum = pgEnum('mission_status', ['assigned', 'in_progress', 'completed', 'failed', 'expired']);
 export const inventoryTypeEnum = pgEnum('inventory_type', ['personal', 'tribe']);
 
 // Users table
@@ -235,6 +254,119 @@ export const pushSubscriptions = pgTable('push_subscriptions', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// Weather events table
+export const weatherEvents = pgTable('weather_events', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  seasonId: uuid('season_id').notNull().references(() => seasons.id),
+  day: integer('day').notNull(),
+  weatherType: weatherTypeEnum('weather_type').notNull(),
+  severity: integer('severity').notNull().default(1), // 1-3: mild, moderate, severe
+  hungerModifier: integer('hunger_modifier').notNull().default(0), // e.g., -10 for heat
+  thirstModifier: integer('thirst_modifier').notNull().default(0),
+  comfortModifier: integer('comfort_modifier').notNull().default(0),
+  description: text('description').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Camp upgrades table
+export const campUpgrades = pgTable('camp_upgrades', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  tribeId: uuid('tribe_id').notNull().references(() => tribes.id),
+  upgradeType: upgradeTypeEnum('upgrade_type').notNull(),
+  level: integer('level').notNull().default(1), // Can upgrade multiple times
+  resourceCost: jsonb('resource_cost').notNull(), // e.g., { firewood: 5, coconut: 3 }
+  benefits: jsonb('benefits').notNull(), // e.g., { comfortBonus: 5, findRateBonus: 10 }
+  builtAt: timestamp('built_at').defaultNow().notNull(),
+  builtBy: uuid('built_by').notNull().references(() => players.id),
+});
+
+// Random events table
+export const randomEvents = pgTable('random_events', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  seasonId: uuid('season_id').notNull().references(() => seasons.id),
+  day: integer('day').notNull(),
+  eventType: randomEventTypeEnum('event_type').notNull(),
+  targetType: subjectTypeEnum('target_type').notNull(), // 'player' or 'tribe'
+  targetId: uuid('target_id').notNull(),
+  description: text('description').notNull(),
+  effects: jsonb('effects').notNull(), // Stat changes, item losses, etc.
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Crafting recipes table (defines what can be crafted)
+export const craftingRecipes = pgTable('crafting_recipes', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull().unique(),
+  description: text('description').notNull(),
+  ingredients: jsonb('ingredients').notNull(), // e.g., [{ item: 'vine', quantity: 2 }, { item: 'stick', quantity: 1 }]
+  resultItem: text('result_item').notNull(), // e.g., 'fishing_rod'
+  resultQuantity: integer('result_quantity').notNull().default(1),
+  unlockCondition: text('unlock_condition'), // Optional: conditions to unlock recipe
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Crafted items log table (tracks when items are crafted)
+export const craftingLog = pgTable('crafting_log', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  playerId: uuid('player_id').notNull().references(() => players.id),
+  recipeId: uuid('recipe_id').notNull().references(() => craftingRecipes.id),
+  craftedAt: timestamp('crafted_at').defaultNow().notNull(),
+});
+
+// Secret missions table
+export const secretMissions = pgTable('secret_missions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  playerId: uuid('player_id').notNull().references(() => players.id),
+  seasonId: uuid('season_id').notNull().references(() => seasons.id),
+  day: integer('day').notNull(),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  objective: jsonb('objective').notNull(), // e.g., { type: 'vote_for', target: 'player-id' }
+  reward: jsonb('reward').notNull(), // e.g., { statBonus: { comfort: 10 }, advantage: true }
+  status: missionStatusEnum('status').notNull().default('assigned'),
+  expiresAt: timestamp('expires_at').notNull(),
+  completedAt: timestamp('completed_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Player relationships table (for trust meter)
+export const playerRelationships = pgTable('player_relationships', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  seasonId: uuid('season_id').notNull().references(() => seasons.id),
+  playerId: uuid('player_id').notNull().references(() => players.id),
+  targetPlayerId: uuid('target_player_id').notNull().references(() => players.id),
+  trustLevel: integer('trust_level').notNull().default(50), // 0-100
+  allianceStrength: integer('alliance_strength').notNull().default(0), // 0-100
+  lastInteraction: timestamp('last_interaction'),
+  interactions: integer('interactions').notNull().default(0),
+  votedTogether: integer('voted_together').notNull().default(0),
+  votedAgainst: integer('voted_against').notNull().default(0),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// Rumors table
+export const rumors = pgTable('rumors', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  seasonId: uuid('season_id').notNull().references(() => seasons.id),
+  day: integer('day').notNull(),
+  content: text('content').notNull(), // e.g., "Someone found an advantage at camp"
+  truthful: boolean('truthful').notNull(), // Is this rumor actually true?
+  targetPlayerId: uuid('target_player_id').references(() => players.id), // Optional: about specific player
+  visibleTo: text('visible_to').notNull().default('all'), // 'all', 'tribe:id', 'player:id'
+  expiresAt: timestamp('expires_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Confessional insights table (tracks "insight points" from confessionals)
+export const confessionalInsights = pgTable('confessional_insights', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  confessionalId: uuid('confessional_id').notNull().references(() => confessionals.id),
+  playerId: uuid('player_id').notNull().references(() => players.id),
+  insightPoints: integer('insight_points').notNull().default(1),
+  category: text('category'), // e.g., 'strategy', 'social', 'observation'
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 // Relations (same as before, updated where needed)
 export const usersRelations = relations(users, ({ many }) => ({
   players: many(players),
@@ -251,6 +383,11 @@ export const seasonsRelations = relations(seasons, ({ many }) => ({
   events: many(events),
   advantages: many(advantages),
   inventory: many(inventory),
+  weatherEvents: many(weatherEvents),
+  randomEvents: many(randomEvents),
+  secretMissions: many(secretMissions),
+  playerRelationships: many(playerRelationships),
+  rumors: many(rumors),
 }));
 
 export const playersRelations = relations(players, ({ one, many }) => ({
@@ -269,6 +406,12 @@ export const playersRelations = relations(players, ({ one, many }) => ({
   confessionals: many(confessionals),
   votesGiven: many(votes, { relationName: 'voter' }),
   votesReceived: many(votes, { relationName: 'target' }),
+  campUpgradesBuilt: many(campUpgrades),
+  craftingLogs: many(craftingLog),
+  secretMissions: many(secretMissions),
+  relationshipsFrom: many(playerRelationships, { relationName: 'relationship_from' }),
+  relationshipsTo: many(playerRelationships, { relationName: 'relationship_to' }),
+  confessionalInsights: many(confessionalInsights),
 }));
 
 export const tribesRelations = relations(tribes, ({ one, many }) => ({
@@ -279,6 +422,7 @@ export const tribesRelations = relations(tribes, ({ one, many }) => ({
   members: many(tribeMembers),
   messages: many(messages),
   advantages: many(advantages),
+  campUpgrades: many(campUpgrades),
 }));
 
 export const tribeMembersRelations = relations(tribeMembers, ({ one }) => ({
@@ -359,11 +503,12 @@ export const messagesRelations = relations(messages, ({ one }) => ({
   }),
 }));
 
-export const confessionalsRelations = relations(confessionals, ({ one }) => ({
+export const confessionalsRelations = relations(confessionals, ({ one, many }) => ({
   player: one(players, {
     fields: [confessionals.playerId],
     references: [players.id],
   }),
+  insights: many(confessionalInsights),
 }));
 
 export const challengesRelations = relations(challenges, ({ one, many }) => ({
@@ -417,5 +562,95 @@ export const pushSubscriptionsRelations = relations(pushSubscriptions, ({ one })
   user: one(users, {
     fields: [pushSubscriptions.userId],
     references: [users.id],
+  }),
+}));
+
+export const weatherEventsRelations = relations(weatherEvents, ({ one }) => ({
+  season: one(seasons, {
+    fields: [weatherEvents.seasonId],
+    references: [seasons.id],
+  }),
+}));
+
+export const campUpgradesRelations = relations(campUpgrades, ({ one }) => ({
+  tribe: one(tribes, {
+    fields: [campUpgrades.tribeId],
+    references: [tribes.id],
+  }),
+  builder: one(players, {
+    fields: [campUpgrades.builtBy],
+    references: [players.id],
+  }),
+}));
+
+export const randomEventsRelations = relations(randomEvents, ({ one }) => ({
+  season: one(seasons, {
+    fields: [randomEvents.seasonId],
+    references: [seasons.id],
+  }),
+}));
+
+export const craftingRecipesRelations = relations(craftingRecipes, ({ many }) => ({
+  craftingLogs: many(craftingLog),
+}));
+
+export const craftingLogRelations = relations(craftingLog, ({ one }) => ({
+  player: one(players, {
+    fields: [craftingLog.playerId],
+    references: [players.id],
+  }),
+  recipe: one(craftingRecipes, {
+    fields: [craftingLog.recipeId],
+    references: [craftingRecipes.id],
+  }),
+}));
+
+export const secretMissionsRelations = relations(secretMissions, ({ one }) => ({
+  player: one(players, {
+    fields: [secretMissions.playerId],
+    references: [players.id],
+  }),
+  season: one(seasons, {
+    fields: [secretMissions.seasonId],
+    references: [seasons.id],
+  }),
+}));
+
+export const playerRelationshipsRelations = relations(playerRelationships, ({ one }) => ({
+  season: one(seasons, {
+    fields: [playerRelationships.seasonId],
+    references: [seasons.id],
+  }),
+  player: one(players, {
+    fields: [playerRelationships.playerId],
+    references: [players.id],
+    relationName: 'relationship_from',
+  }),
+  targetPlayer: one(players, {
+    fields: [playerRelationships.targetPlayerId],
+    references: [players.id],
+    relationName: 'relationship_to',
+  }),
+}));
+
+export const rumorsRelations = relations(rumors, ({ one }) => ({
+  season: one(seasons, {
+    fields: [rumors.seasonId],
+    references: [seasons.id],
+  }),
+  targetPlayer: one(players, {
+    fields: [rumors.targetPlayerId],
+    references: [players.id],
+  }),
+}));
+
+export const confessionalInsightsRelations = relations(confessionalInsights, ({ one }) => ({
+  confessional: one(confessionals, {
+    fields: [confessionalInsights.confessionalId],
+    references: [confessionals.id],
+  }),
+  player: one(players, {
+    fields: [confessionalInsights.playerId],
+    references: [players.id],
   }),
 }));
