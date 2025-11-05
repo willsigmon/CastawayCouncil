@@ -285,3 +285,178 @@ export async function emitDailySummaryActivity(input: DailySummaryInput): Promis
     .set({ dayIndex: day })
     .where(eq(seasons.id, seasonId));
 }
+
+/**
+ * Apply daily stat decay with class modifiers
+ */
+export async function applyStatDecayActivity(input: CreateDayStatsInput): Promise<void> {
+  const { seasonId, day } = input;
+
+  // Get all active players with their classes
+  const activePlayers = await db.query.players.findMany({
+    where: and(eq(players.seasonId, seasonId), isNull(players.eliminatedAt)),
+  });
+
+  // Get yesterday's stats
+  const previousDayStats = await db.query.stats.findMany({
+    where: eq(stats.day, day - 1),
+  });
+
+  for (const player of activePlayers) {
+    const prevStats = previousDayStats.find((s) => s.playerId === player.id);
+    if (!prevStats) continue;
+
+    // Calculate decay multiplier based on class
+    let decayMultiplier = 1.0;
+    if (player.playerClass === 'survivalist') {
+      decayMultiplier = 0.85; // 15% slower decay
+    } else if (player.playerClass === 'wildcard' && player.wildcardAbility === 'survivalist') {
+      decayMultiplier = 0.85;
+    }
+
+    // Apply decay
+    const newHunger = Math.max(0, prevStats.hunger - 15 * decayMultiplier);
+    const newThirst = Math.max(0, prevStats.thirst - 20 * decayMultiplier);
+    const newComfort = Math.max(0, prevStats.comfort - 10 * decayMultiplier);
+    const newEnergy = Math.floor((newHunger + newThirst + newComfort) / 3);
+
+    // Update stats
+    await db
+      .update(stats)
+      .set({
+        hunger: newHunger,
+        thirst: newThirst,
+        comfort: newComfort,
+        energy: newEnergy,
+      })
+      .where(and(eq(stats.playerId, player.id), eq(stats.day, day)));
+  }
+
+  console.log(`Applied stat decay for ${activePlayers.length} players on day ${day}`);
+}
+
+/**
+ * Check for medical evacuations (total stats ≤ 50)
+ */
+export interface CheckMedicalEvacsResult {
+  evacuatedCount: number;
+  evacuatedPlayerIds: string[];
+}
+
+export async function checkMedicalEvacsActivity(
+  input: CreateDayStatsInput
+): Promise<CheckMedicalEvacsResult> {
+  const { seasonId, day } = input;
+
+  const activePlayers = await db.query.players.findMany({
+    where: and(eq(players.seasonId, seasonId), isNull(players.eliminatedAt)),
+    with: {
+      stats: {
+        where: eq(stats.day, day),
+      },
+    },
+  });
+
+  const evacuatedPlayerIds: string[] = [];
+
+  for (const player of activePlayers) {
+    const currentStats = player.stats[0];
+    if (!currentStats) continue;
+
+    const total = currentStats.hunger + currentStats.thirst + currentStats.comfort;
+
+    if (total <= 50) {
+      // Mark as medical alert
+      await db
+        .update(stats)
+        .set({ medicalAlert: true })
+        .where(and(eq(stats.playerId, player.id), eq(stats.day, day)));
+
+      // TODO: Give player 15 minutes to improve stats
+      // For now, immediately evacuate
+
+      await db
+        .update(players)
+        .set({ eliminatedAt: new Date(), role: 'spectator' })
+        .where(eq(players.id, player.id));
+
+      evacuatedPlayerIds.push(player.id);
+
+      // Emit medical evac event
+      await db.insert(events).values({
+        seasonId,
+        day,
+        kind: 'medical_evac',
+        payloadJson: {
+          playerId: player.id,
+          displayName: player.displayName,
+          totalStats: total,
+        },
+      });
+
+      console.log(
+        `Medical evacuation: ${player.displayName} (total stats: ${total})`
+      );
+    }
+  }
+
+  return {
+    evacuatedCount: evacuatedPlayerIds.length,
+    evacuatedPlayerIds,
+  };
+}
+
+/**
+ * Run the finale (Final 4 → winner picks 2 for battle → Final 3 → Jury vote)
+ */
+export interface RunFinaleInput {
+  seasonId: string;
+  day: number;
+}
+
+export async function runFinaleActivity(input: RunFinaleInput): Promise<void> {
+  const { seasonId, day } = input;
+
+  console.log(`Running finale for season ${seasonId} on day ${day}`);
+
+  // Get final 4 players
+  const finalPlayers = await db.query.players.findMany({
+    where: and(eq(players.seasonId, seasonId), isNull(players.eliminatedAt)),
+  });
+
+  if (finalPlayers.length !== 4) {
+    console.error(`Expected 4 players for finale, got ${finalPlayers.length}`);
+    // Continue anyway
+  }
+
+  // Emit finale event
+  await db.insert(events).values({
+    seasonId,
+    day,
+    kind: 'finale',
+    payloadJson: {
+      phase: 'final_4',
+      playerIds: finalPlayers.map((p) => p.id),
+    },
+  });
+
+  // TODO: In a real implementation:
+  // 1. Run final immunity challenge
+  // 2. Winner picks 2 players for fire-making challenge
+  // 3. Winner of fire-making joins Final 3
+  // 4. Jury votes
+  // 5. Announce winner
+
+  // For now, mark all as finalists
+  for (const player of finalPlayers) {
+    await db
+      .update(players)
+      .set({ role: 'finalist' })
+      .where(eq(players.id, player.id));
+  }
+
+  // Mark season as complete
+  await db.update(seasons).set({ status: 'complete' }).where(eq(seasons.id, seasonId));
+
+  console.log(`Finale completed. Season ${seasonId} is now complete.`);
+}
