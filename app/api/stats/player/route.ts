@@ -4,6 +4,15 @@ import { ApiError } from "@/app/_server/errors";
 import { sql } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
+interface AggregatedStatsRow {
+  challenge_wins: number;
+  tribals_survived: number;
+  votes_received: number;
+  advantages_found: number;
+  alliance_count: number;
+  confessional_count: number;
+}
+
 export async function GET(req: NextRequest) {
   await requireAuth();
   const { searchParams } = new URL(req.url);
@@ -33,6 +42,14 @@ export async function GET(req: NextRequest) {
   `);
 
   // drizzle(postgres-js) execute returns a RowList (array-like); first row holds aggregated stats
-  const firstRow = (statsResult as unknown as any[])[0] ?? {};
-  return NextResponse.json({ ok: true, stats: firstRow });
+  const firstRow = (statsResult as unknown as AggregatedStatsRow[])[0];
+  const empty: AggregatedStatsRow = {
+    challenge_wins: 0,
+    tribals_survived: 0,
+    votes_received: 0,
+    advantages_found: 0,
+    alliance_count: 0,
+    confessional_count: 0,
+  };
+  return NextResponse.json({ ok: true, stats: firstRow ?? empty });
 }
