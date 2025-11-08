@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState, useMemo, useCallback } from "react";
 import Link from "next/link";
-import { useSeason } from "./_components/SeasonContext";
-import { createClient } from "./_lib/supabase/client";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatedCounter } from "./_components/AnimatedCounter";
 import { FAQAccordion } from "./_components/FAQAccordion";
+import { useSeason } from "./_components/SeasonContext";
+import { createClient } from "./_lib/supabase/client";
 
 interface Season {
   id: string;
@@ -229,7 +229,7 @@ export default function Home() {
                 15 days. 18 players. 3 phases per day. Only 1 survivor.
               </p>
             </div>
-            
+
             <div className="grid md:grid-cols-3 gap-10 mb-16">
               <div className="text-center group cursor-default">
                 <div className="text-7xl mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">🏕️</div>
@@ -238,7 +238,7 @@ export default function Home() {
                   Forage for food, search for hidden immunity idols, build camp improvements, and plot with your alliance. Every action matters.
                 </p>
               </div>
-              
+
               <div className="text-center group cursor-default">
                 <div className="text-7xl mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">⚔️</div>
                 <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-4 transition-colors group-hover:text-orange-400">Challenge Phase</h3>
@@ -246,7 +246,7 @@ export default function Home() {
                   Compete in immunity challenges. Winners are safe from elimination. Losers face tribal council. Your archetype abilities activate here.
                 </p>
               </div>
-              
+
               <div className="text-center group cursor-default">
                 <div className="text-7xl mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">🔥</div>
                 <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-4 transition-colors group-hover:text-orange-400">Tribal Council</h3>
@@ -484,7 +484,7 @@ export default function Home() {
                   Every challenge uses cryptographic commit-reveal protocol. The server commits to results before you make choices. All RNG is verifiable—no hidden advantages, no cheating possible.
                 </p>
               </div>
-              
+
               <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500 hover:shadow-2xl hover:shadow-amber-900/40 hover:scale-105 group cursor-pointer">
                 <div className="text-5xl mb-4 transition-transform duration-300 group-hover:scale-110">⏱️</div>
                 <h3 className="text-xl font-tribal text-amber-100 font-bold mb-3 group-hover:text-orange-400 transition-colors">Your Own Pace</h3>
@@ -492,7 +492,7 @@ export default function Home() {
                   Each phase lasts 6-8 hours. No need to be online constantly. Check in when it works for you. 15 in-game days = 4-5 real weeks. Perfect for busy schedules.
                 </p>
               </div>
-              
+
               <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500 hover:shadow-2xl hover:shadow-amber-900/40 hover:scale-105 group cursor-pointer">
                 <div className="text-5xl mb-4 transition-transform duration-300 group-hover:scale-110">💬</div>
                 <h3 className="text-xl font-tribal text-amber-100 font-bold mb-3 group-hover:text-orange-400 transition-colors">Real Strategy</h3>
@@ -500,14 +500,7 @@ export default function Home() {
                   Form secret alliances. Backstab rivals. Bluff about idols. Every tribal council is a social chess match. Your words matter as much as your stats.
                 </p>
               </div>
-              
-              <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500 hover:shadow-2xl hover:shadow-amber-900/40 hover:scale-105 group cursor-pointer">
-                <div className="text-5xl mb-4 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">✨</div>
-                <h3 className="text-xl font-tribal text-amber-100 font-bold mb-3 group-hover:text-orange-400 transition-colors">Completely Free</h3>
-                <p className="text-amber-200/80 leading-relaxed">
-                  No purchases. No ads. No premium features. No pay-to-win. Everyone plays the exact same game. Pure competition, pure strategy, pure survival.
-                </p>
-              </div>
+
             </div>
           </div>
 

@@ -7,9 +7,9 @@ Added complementary features inspired by D&D and Survivor gameplay mechanics. Al
 
 ## 🎮 New Features
 
-### 1. **Player Stats Dashboard** 
-**Component**: `app/_components/PlayerStatsCard.tsx`  
-**API**: `/api/stats/player`  
+### 1. **Player Stats Dashboard**
+**Component**: `app/_components/PlayerStatsCard.tsx`
+**API**: `/api/stats/player`
 **Purpose**: Visual HUD showing season performance metrics
 
 **Metrics Tracked**:
@@ -30,8 +30,8 @@ import { PlayerStatsCard } from '@/app/_components/PlayerStatsCard';
 ---
 
 ### 2. **Alliance Tracker**
-**Schema**: `allianceNotes` table  
-**API**: `/api/alliance/notes`  
+**Schema**: `allianceNotes` table
+**API**: `/api/alliance/notes`
 **Purpose**: Private relationship tracking (no mechanical bonuses)
 
 **Features**:
@@ -57,7 +57,7 @@ POST /api/alliance/notes
 ---
 
 ### 3. **Challenge Archive with RNG Verification**
-**API**: `/api/challenge/verify`  
+**API**: `/api/challenge/verify`
 **Purpose**: Verify commit-reveal fairness for past challenges
 
 **Features**:
@@ -88,8 +88,8 @@ POST /api/challenge/verify
 ---
 
 ### 4. **Jury Question Board**
-**Schema**: `juryQuestions` table  
-**API**: `/api/jury/questions`  
+**Schema**: `juryQuestions` table
+**API**: `/api/jury/questions`
 **Purpose**: Structured Q&A for Final Tribal Council
 
 **Flow**:
@@ -120,7 +120,7 @@ PATCH /api/jury/questions
 ---
 
 ### 5. **Achievement Badges**
-**API**: `/api/achievements/unlock`  
+**API**: `/api/achievements/unlock`
 **Purpose**: Cosmetic badges for milestones (no stat bonuses)
 
 **Achievements**:
@@ -141,7 +141,7 @@ POST /api/achievements/unlock
 ---
 
 ### 6. **Advantage Inspector**
-**API**: `/api/advantages/catalog`  
+**API**: `/api/advantages/catalog`
 **Purpose**: View all advantage types and their rules
 
 **Advantage Types**:
@@ -153,8 +153,8 @@ POST /api/achievements/unlock
 ---
 
 ### 7. **Season Timeline Visualizer**
-**Component**: `app/_components/SeasonTimeline.tsx`  
-**API**: `/api/season/timeline`  
+**Component**: `app/_components/SeasonTimeline.tsx`
+**API**: `/api/season/timeline`
 **Purpose**: Interactive phase progression tracker
 
 **Features**:

@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/app/_server/auth";
 import { ApiError } from "@/app/_server/errors";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   await requireAuth();

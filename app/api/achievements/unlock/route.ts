@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/app/_server/auth";
 import { db } from "@/app/_server/db/client";
 import { sql } from "drizzle-orm";
+import { NextRequest, NextResponse } from "next/server";
 
 const ACHIEVEMENTS = [
   {
