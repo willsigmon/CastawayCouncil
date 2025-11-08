@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   }
 
   // Aggregate stats from existing tables
-  const stats = await db.execute(sql`
+  const statsResult = await db.execute(sql`
     SELECT
       COALESCE((SELECT COUNT(*) FROM ${sql.identifier("challenge_results")}
         WHERE subject_id = ${playerId} AND subject_type = 'player'), 0)::INT as challenge_wins,
@@ -32,5 +32,7 @@ export async function GET(req: NextRequest) {
         WHERE player_id = ${playerId}), 0)::INT as confessional_count
   `);
 
-  return NextResponse.json({ ok: true, stats: stats.rows[0] });
+  // drizzle(postgres-js) execute returns a RowList (array-like); first row holds aggregated stats
+  const firstRow = (statsResult as unknown as any[])[0] ?? {};
+  return NextResponse.json({ ok: true, stats: firstRow });
 }
