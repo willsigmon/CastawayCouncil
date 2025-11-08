@@ -1,8 +1,8 @@
-import { redirect } from "next/navigation";
 import { createClient } from "@/app/_lib/supabase/server";
 import { db } from "@/server/db/client";
 import { playerApplications } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
+import { redirect } from "next/navigation";
 import { ApplicationForm } from "./ApplicationForm";
 
 export const dynamic = "force-dynamic";
