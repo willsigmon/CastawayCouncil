@@ -39,8 +39,8 @@ const ACHIEVEMENTS = [
 ] as const;
 
 export async function POST(req: NextRequest) {
-  const user = await requireAuth();
-  const { playerId, seasonId } = await req.json();
+  await requireAuth();
+  const { playerId } = await req.json();
 
   // Fetch player stats
   const statsResult = await db.execute(sql`

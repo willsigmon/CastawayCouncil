@@ -1,6 +1,5 @@
 "use client";
 
-import { createClient } from "@/app/_lib/supabase/client";
 import { useEffect, useState } from "react";
 
 type PlayerStats = {
@@ -15,7 +14,6 @@ type PlayerStats = {
 export function PlayerStatsCard({ playerId, seasonId }: { playerId: string; seasonId: string }) {
   const [stats, setStats] = useState<PlayerStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
 
   useEffect(() => {
     const fetchStats = async () => {

@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  const user = await requireAuth();
+  await requireAuth();
   const body = await req.json();
   const data = JuryQuestionSchema.omit({ id: true, answeredAt: true }).parse(body);
 
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const user = await requireAuth();
+  await requireAuth();
   const { id, answer } = await req.json();
 
   if (!id || !answer) {
