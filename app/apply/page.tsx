@@ -49,7 +49,17 @@ export default async function ApplyPage() {
           </p>
         </div>
 
-        <ApplicationForm initialApplication={existingApplication ?? null} />
+        <ApplicationForm
+          initialApplication=
+            {existingApplication
+              ? {
+                  ...existingApplication,
+                  // Normalize Date objects to strings for the client component props
+                  createdAt: (existingApplication.createdAt as Date).toISOString(),
+                  updatedAt: (existingApplication.updatedAt as Date).toISOString(),
+                }
+              : null}
+        />
       </div>
     </main>
   );
