@@ -38,6 +38,15 @@ export default async function ApplyPage() {
     .where(eq(playerApplications.userId, session.user.id))
     .limit(1);
 
+  // Convert Date objects to ISO strings for client component
+  const initialApplication = existingApplication
+    ? {
+        ...existingApplication,
+        createdAt: existingApplication.createdAt.toISOString(),
+        updatedAt: existingApplication.updatedAt.toISOString(),
+      }
+    : null;
+
   return (
     <main className="min-h-screen pb-16">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-10">
@@ -49,7 +58,7 @@ export default async function ApplyPage() {
           </p>
         </div>
 
-        <ApplicationForm initialApplication={existingApplication ?? null} />
+        <ApplicationForm initialApplication={initialApplication} />
       </div>
     </main>
   );
