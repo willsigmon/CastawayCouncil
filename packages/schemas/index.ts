@@ -135,3 +135,44 @@ export const playerApplicationSchema = z.object({
   q4: z.string().min(1).max(1500),
   q5: z.string().min(1).max(1500),
 });
+
+// Alliance Notes
+export const AllianceNoteSchema = z.object({
+  id: z.string().uuid().optional(),
+  seasonId: z.string().uuid(),
+  authorId: z.string().uuid(),
+  subjectPlayerId: z.string().uuid(),
+  note: z.string().min(1).max(2000),
+  trustLevel: z.enum(["distrust", "neutral", "ally", "core"]),
+  tags: z.array(z.string()).default([]),
+  pinned: z.boolean().default(false),
+});
+
+// Jury Questions
+export const JuryQuestionSchema = z.object({
+  id: z.string().uuid().optional(),
+  seasonId: z.string().uuid(),
+  jurorId: z.string().uuid(),
+  finalistId: z.string().uuid(),
+  question: z.string().min(10).max(2000),
+  answer: z.string().max(4000).optional(),
+  answeredAt: z.date().optional(),
+});
+
+// Challenge Verification
+export const VerifyChallengeSchema = z.object({
+  challengeId: z.string().uuid(),
+});
+
+// Achievements
+export const AchievementSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string(),
+  icon: z.string(),
+  rarity: z.enum(["common", "rare", "legendary"]),
+  condition: z.object({
+    type: z.string(),
+    threshold: z.number(),
+  }),
+});

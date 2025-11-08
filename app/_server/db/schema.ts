@@ -1,5 +1,5 @@
-import { pgTable, text, timestamp, integer, boolean, jsonb, pgEnum, uuid, index, uniqueIndex } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
+import { boolean, index, integer, jsonb, pgEnum, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 
 // Enums
 export const seasonStatusEnum = pgEnum("season_status", ["planned", "active", "complete"]);
@@ -324,6 +324,44 @@ export const pushSubscriptions = pgTable(
   },
   (table) => ({
     userIdx: index("push_subscriptions_user_idx").on(table.userId),
+  })
+);
+
+export const allianceNotes = pgTable(
+  "alliance_notes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    seasonId: uuid("season_id").notNull().references(() => seasons.id),
+    authorId: uuid("author_id").notNull().references(() => players.id),
+    subjectPlayerId: uuid("subject_player_id").notNull().references(() => players.id),
+    note: text("note").notNull(),
+    trustLevel: text("trust_level").notNull(), // 'distrust' | 'neutral' | 'ally' | 'core'
+    tags: text("tags").array().default([]),
+    pinned: boolean("pinned").default(false),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    authorIdx: index("alliance_notes_author_idx").on(table.authorId),
+    seasonIdx: index("alliance_notes_season_idx").on(table.seasonId),
+  })
+);
+
+export const juryQuestions = pgTable(
+  "jury_questions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    seasonId: uuid("season_id").notNull().references(() => seasons.id),
+    jurorId: uuid("juror_id").notNull().references(() => players.id),
+    finalistId: uuid("finalist_id").notNull().references(() => players.id),
+    question: text("question").notNull(),
+    answer: text("answer"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    answeredAt: timestamp("answered_at"),
+  },
+  (table) => ({
+    seasonIdx: index("jury_questions_season_idx").on(table.seasonId),
+    finalistIdx: index("jury_questions_finalist_idx").on(table.finalistId),
   })
 );
 
