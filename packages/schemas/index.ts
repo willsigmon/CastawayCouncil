@@ -197,8 +197,8 @@ export const CampaignEventSchema = z.object({
   description: z.string().min(1).max(2000),
   scheduledDay: z.number().int().positive().optional(),
   scheduledPhase: z.enum(["camp", "challenge", "vote"]).optional(),
-  payloadJson: z.record(z.any()).optional(),
-  statEffectsJson: z.record(z.record(z.number())).optional(),
+  payloadJson: z.record(z.string(), z.any()).optional(),
+  statEffectsJson: z.record(z.string(), z.record(z.string(), z.number())).optional(),
 });
 
 export const CampaignEventListSchema = z.object({
@@ -218,10 +218,10 @@ export const ProjectSchema = z.object({
   description: z.string().min(1).max(2000),
   status: z.enum(["planning", "active", "completed", "abandoned"]).default("planning"),
   targetProgress: z.number().int().positive().default(100),
-  requiredResourcesJson: z.record(z.number()).optional(),
+  requiredResourcesJson: z.record(z.string(), z.number()).optional(),
   completionRewardsJson: z
     .object({
-      statDeltas: z.record(z.number()).optional(),
+      statDeltas: z.record(z.string(), z.number()).optional(),
       items: z.array(z.string().uuid()).optional(),
     })
     .optional(),
@@ -229,7 +229,7 @@ export const ProjectSchema = z.object({
 
 export const ProjectContributionSchema = z.object({
   projectId: z.string().uuid(),
-  resourcesContributedJson: z.record(z.number()).optional(),
+  resourcesContributedJson: z.record(z.string(), z.number()).optional(),
   progressAdded: z.number().int().nonnegative().default(0),
 });
 
@@ -273,7 +273,7 @@ export const RevealCommitSchema = z.object({
 
 export const RevealRevealSchema = z.object({
   revealId: z.string().uuid(),
-  revealContentJson: z.record(z.any()),
+  revealContentJson: z.record(z.string(), z.any()),
 });
 
 export const RevealSchema = z.object({
@@ -284,7 +284,7 @@ export const RevealSchema = z.object({
   description: z.string().max(2000).optional(),
   scheduledDay: z.number().int().positive().optional(),
   scheduledPhase: z.enum(["camp", "challenge", "vote"]).optional(),
-  revealContentJson: z.record(z.any()).optional(),
+  revealContentJson: z.record(z.string(), z.any()).optional(),
 });
 
 export const RevealListSchema = z.object({
@@ -336,8 +336,8 @@ export const TradeOfferSchema = z.object({
   recipientId: z.string().uuid(),
   proposerTribeId: z.string().uuid().optional(),
   recipientTribeId: z.string().uuid().optional(),
-  resourcesOfferedJson: z.record(z.number()), // { resourceId: quantity }
-  resourcesRequestedJson: z.record(z.number()), // { resourceId: quantity }
+  resourcesOfferedJson: z.record(z.string(), z.number()), // { resourceId: quantity }
+  resourcesRequestedJson: z.record(z.string(), z.number()), // { resourceId: quantity }
   message: z.string().max(500).optional(),
 });
 
@@ -357,10 +357,10 @@ export const CraftingRecipeSchema = z.object({
   seasonId: z.string().uuid(),
   name: z.string().min(1).max(200),
   description: z.string().max(1000).optional(),
-  inputsJson: z.record(z.number()), // { resourceId: quantity }
-  outputsJson: z.record(z.number()), // { resourceId: quantity }
+  inputsJson: z.record(z.string(), z.number()), // { resourceId: quantity }
+  outputsJson: z.record(z.string(), z.number()), // { resourceId: quantity }
   craftingTime: z.number().int().positive().default(1),
-  skillRequirementsJson: z.record(z.number()).optional(), // { archetype: bonus }
+  skillRequirementsJson: z.record(z.string(), z.number()).optional(), // { archetype: bonus }
   status: z.enum(["discovered", "hidden"]).default("discovered"),
   prerequisiteRecipeId: z.string().uuid().optional(),
 });
