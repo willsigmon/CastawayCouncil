@@ -4,10 +4,11 @@ import {
     getTotalSeasonsCount,
     getTotalVotesCount,
     getMessagesCountToday,
-} from "@/server/analytics/queries";
+} from "@/app/_server/analytics/queries";
 
 // Cache for 60 seconds with stale-while-revalidate
 export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {

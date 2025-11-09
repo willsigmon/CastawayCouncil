@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
-import { db } from "@/server/db/client";
-import { seasons } from "@/server/db/schema";
+import { db } from "@/app/_server/db/client";
+import { seasons } from "@/app/_server/db/schema";
 import { desc } from "drizzle-orm";
+
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
