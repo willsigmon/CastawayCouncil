@@ -3,6 +3,7 @@ import { requireAuth } from "@/app/_server/auth";
 import { db } from "@/app/_server/db/client";
 import { allianceNotes, players } from "@/app/_server/db/schema";
 import { eq, and, sql, count } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 
 export async function GET(req: NextRequest) {
   try {
@@ -29,19 +30,23 @@ export async function GET(req: NextRequest) {
       )
       .groupBy(allianceNotes.trustLevel);
 
+    // Create aliases for players table
+    const author = alias(players, "author");
+    const subject = alias(players, "subject");
+
     // Get all relationships (author -> subject with trust level)
     const relationships = await db
       .select({
         authorId: allianceNotes.authorId,
-        authorName: sql<string>`author.display_name`,
+        authorName: author.displayName,
         subjectId: allianceNotes.subjectPlayerId,
-        subjectName: sql<string>`subject.display_name`,
+        subjectName: subject.displayName,
         trustLevel: allianceNotes.trustLevel,
         noteCount: count(),
       })
       .from(allianceNotes)
-      .innerJoin(players.as("author"), eq(allianceNotes.authorId, sql`author.id`))
-      .innerJoin(players.as("subject"), eq(allianceNotes.subjectPlayerId, sql`subject.id`))
+      .innerJoin(author, eq(allianceNotes.authorId, author.id))
+      .innerJoin(subject, eq(allianceNotes.subjectPlayerId, subject.id))
       .where(
         authorId
           ? and(eq(allianceNotes.seasonId, seasonId), eq(allianceNotes.authorId, authorId))
@@ -49,9 +54,9 @@ export async function GET(req: NextRequest) {
       )
       .groupBy(
         allianceNotes.authorId,
-        sql`author.display_name`,
+        author.displayName,
         allianceNotes.subjectPlayerId,
-        sql`subject.display_name`,
+        subject.displayName,
         allianceNotes.trustLevel
       );
 
@@ -59,20 +64,20 @@ export async function GET(req: NextRequest) {
     const playerTrustCounts = await db
       .select({
         playerId: allianceNotes.authorId,
-        playerName: sql<string>`author.display_name`,
+        playerName: author.displayName,
         distrust: sql<number>`COUNT(CASE WHEN ${allianceNotes.trustLevel} = 'distrust' THEN 1 END)`,
         neutral: sql<number>`COUNT(CASE WHEN ${allianceNotes.trustLevel} = 'neutral' THEN 1 END)`,
         ally: sql<number>`COUNT(CASE WHEN ${allianceNotes.trustLevel} = 'ally' THEN 1 END)`,
         core: sql<number>`COUNT(CASE WHEN ${allianceNotes.trustLevel} = 'core' THEN 1 END)`,
       })
       .from(allianceNotes)
-      .innerJoin(players.as("author"), eq(allianceNotes.authorId, sql`author.id`))
+      .innerJoin(author, eq(allianceNotes.authorId, author.id))
       .where(
         authorId
           ? and(eq(allianceNotes.seasonId, seasonId), eq(allianceNotes.authorId, authorId))
           : eq(allianceNotes.seasonId, seasonId)
       )
-      .groupBy(allianceNotes.authorId, sql`author.display_name`);
+      .groupBy(allianceNotes.authorId, author.displayName);
 
     return NextResponse.json({
       ok: true,
