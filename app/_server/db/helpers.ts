@@ -813,12 +813,14 @@ export async function createTradeOffer(data: {
 }) {
   // Verify proposer has the resources they're offering
   for (const [resourceId, quantity] of Object.entries(data.resourcesOfferedJson)) {
-    const inventory = await getOrCreateInventory({
-      seasonId: data.seasonId,
+    const inventory = await getOrCreateInventory(
+      data.seasonId,
       resourceId,
-      playerId: data.proposerTribeId ? undefined : data.proposerId,
-      tribeId: data.proposerTribeId,
-    });
+      {
+        playerId: data.proposerTribeId ? undefined : data.proposerId,
+        tribeId: data.proposerTribeId,
+      }
+    );
     if (inventory.quantity < quantity) {
       throw new Error(`Insufficient ${resourceId}: have ${inventory.quantity}, need ${quantity}`);
     }
@@ -853,12 +855,14 @@ export async function acceptTrade(tradeId: string) {
 
   // Verify recipient has the resources they're offering (requested by proposer)
   for (const [resourceId, quantity] of Object.entries(trade.resourcesRequestedJson as Record<string, number>)) {
-    const inventory = await getOrCreateInventory({
-      seasonId: trade.seasonId,
+    const inventory = await getOrCreateInventory(
+      trade.seasonId,
       resourceId,
-      playerId: trade.recipientTribeId ? undefined : trade.recipientId,
-      tribeId: trade.recipientTribeId || undefined,
-    });
+      {
+        playerId: trade.recipientTribeId ? undefined : trade.recipientId,
+        tribeId: trade.recipientTribeId || undefined,
+      }
+    );
     if (inventory.quantity < quantity) {
       throw new Error(`Recipient insufficient ${resourceId}: have ${inventory.quantity}, need ${quantity}`);
     }
@@ -870,12 +874,14 @@ export async function acceptTrade(tradeId: string) {
     // Remove from proposer
     await updateInventory({
       inventoryId: (
-        await getOrCreateInventory({
-          seasonId: trade.seasonId,
+        await getOrCreateInventory(
+          trade.seasonId,
           resourceId,
-          playerId: trade.proposerTribeId ? undefined : trade.proposerId,
-          tribeId: trade.proposerTribeId || undefined,
-        })
+          {
+            playerId: trade.proposerTribeId ? undefined : trade.proposerId,
+            tribeId: trade.proposerTribeId || undefined,
+          }
+        )
       ).id,
       quantityDelta: -quantity,
       reason: "trade_offer",
@@ -886,12 +892,14 @@ export async function acceptTrade(tradeId: string) {
     // Add to recipient
     await updateInventory({
       inventoryId: (
-        await getOrCreateInventory({
-          seasonId: trade.seasonId,
+        await getOrCreateInventory(
+          trade.seasonId,
           resourceId,
-          playerId: trade.recipientTribeId ? undefined : trade.recipientId,
-          tribeId: trade.recipientTribeId || undefined,
-        })
+          {
+            playerId: trade.recipientTribeId ? undefined : trade.recipientId,
+            tribeId: trade.recipientTribeId || undefined,
+          }
+        )
       ).id,
       quantityDelta: quantity,
       reason: "trade_receive",
@@ -905,12 +913,14 @@ export async function acceptTrade(tradeId: string) {
     // Remove from recipient
     await updateInventory({
       inventoryId: (
-        await getOrCreateInventory({
-          seasonId: trade.seasonId,
+        await getOrCreateInventory(
+          trade.seasonId,
           resourceId,
-          playerId: trade.recipientTribeId ? undefined : trade.recipientId,
-          tribeId: trade.recipientTribeId || undefined,
-        })
+          {
+            playerId: trade.recipientTribeId ? undefined : trade.recipientId,
+            tribeId: trade.recipientTribeId || undefined,
+          }
+        )
       ).id,
       quantityDelta: -quantity,
       reason: "trade_offer",
@@ -921,12 +931,14 @@ export async function acceptTrade(tradeId: string) {
     // Add to proposer
     await updateInventory({
       inventoryId: (
-        await getOrCreateInventory({
-          seasonId: trade.seasonId,
+        await getOrCreateInventory(
+          trade.seasonId,
           resourceId,
-          playerId: trade.proposerTribeId ? undefined : trade.proposerId,
-          tribeId: trade.proposerTribeId || undefined,
-        })
+          {
+            playerId: trade.proposerTribeId ? undefined : trade.proposerId,
+            tribeId: trade.proposerTribeId || undefined,
+          }
+        )
       ).id,
       quantityDelta: quantity,
       reason: "trade_receive",
@@ -1029,12 +1041,14 @@ export async function craftItem(
   // Verify player has required resources
   const inputs = recipe.inputsJson as Record<string, number>;
   for (const [resourceId, quantity] of Object.entries(inputs)) {
-    const inventory = await getOrCreateInventory({
+    const inventory = await getOrCreateInventory(
       seasonId,
       resourceId,
-      playerId: tribeId ? undefined : playerId,
-      tribeId,
-    });
+      {
+        playerId: tribeId ? undefined : playerId,
+        tribeId,
+      }
+    );
     if (inventory.quantity < quantity) {
       throw new Error(`Insufficient ${resourceId}: have ${inventory.quantity}, need ${quantity}`);
     }
@@ -1044,12 +1058,14 @@ export async function craftItem(
   for (const [resourceId, quantity] of Object.entries(inputs)) {
     await updateInventory({
       inventoryId: (
-        await getOrCreateInventory({
+        await getOrCreateInventory(
           seasonId,
           resourceId,
-          playerId: tribeId ? undefined : playerId,
-          tribeId,
-        })
+          {
+            playerId: tribeId ? undefined : playerId,
+            tribeId,
+          }
+        )
       ).id,
       quantityDelta: -quantity,
       reason: "crafting",
@@ -1063,12 +1079,14 @@ export async function craftItem(
   for (const [resourceId, quantity] of Object.entries(outputs)) {
     await updateInventory({
       inventoryId: (
-        await getOrCreateInventory({
+        await getOrCreateInventory(
           seasonId,
           resourceId,
-          playerId: tribeId ? undefined : playerId,
-          tribeId,
-        })
+          {
+            playerId: tribeId ? undefined : playerId,
+            tribeId,
+          }
+        )
       ).id,
       quantityDelta: quantity,
       reason: "crafting",
