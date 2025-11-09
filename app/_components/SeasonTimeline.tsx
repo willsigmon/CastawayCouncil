@@ -35,6 +35,7 @@ export function SeasonTimeline({ seasonId }: { seasonId: string }) {
   const [campaignEvents, setCampaignEvents] = useState<CampaignEvent[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null);
 
   const fetchTimeline = async () => {
     try {
@@ -82,11 +83,18 @@ export function SeasonTimeline({ seasonId }: { seasonId: string }) {
             filter: `season_id=eq.${seasonId}`,
           },
           () => {
-            // Refresh campaign events when they change
-            fetch(`/api/campaign/events?seasonId=${seasonId}&status=all`)
-              .then((res) => res.json())
-              .then((data) => setCampaignEvents(data.events || []))
-              .catch(console.error);
+            // Debounce rapid updates
+            setDebounceTimer((prevTimer) => {
+              if (prevTimer) {
+                clearTimeout(prevTimer);
+              }
+              return setTimeout(() => {
+                fetch(`/api/campaign/events?seasonId=${seasonId}&status=all`)
+                  .then((res) => res.json())
+                  .then((data) => setCampaignEvents(data.events || []))
+                  .catch(console.error);
+              }, 500);
+            });
           }
         )
         .on(
@@ -98,17 +106,30 @@ export function SeasonTimeline({ seasonId }: { seasonId: string }) {
             filter: `season_id=eq.${seasonId}`,
           },
           () => {
-            // Refresh projects when they change
-            fetch(`/api/projects?seasonId=${seasonId}`)
-              .then((res) => res.json())
-              .then((data) => setProjects(data.projects || []))
-              .catch(console.error);
+            // Debounce rapid updates
+            setDebounceTimer((prevTimer) => {
+              if (prevTimer) {
+                clearTimeout(prevTimer);
+              }
+              return setTimeout(() => {
+                fetch(`/api/projects?seasonId=${seasonId}`)
+                  .then((res) => res.json())
+                  .then((data) => setProjects(data.projects || []))
+                  .catch(console.error);
+              }, 500);
+            });
           }
         )
         .subscribe();
 
       return () => {
         try {
+          setDebounceTimer((prevTimer) => {
+            if (prevTimer) {
+              clearTimeout(prevTimer);
+            }
+            return null;
+          });
           supabase.removeChannel(channel);
         } catch {
           // Ignore cleanup errors

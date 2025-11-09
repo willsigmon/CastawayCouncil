@@ -44,6 +44,7 @@ export default function GMPage() {
   const [activeTab, setActiveTab] = useState<"events" | "projects" | "reveals" | "analytics">("events");
   const [showCreateEventModal, setShowCreateEventModal] = useState(false);
   const [showCreateProjectModal, setShowCreateProjectModal] = useState(false);
+  const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null);
 
   const fetchData = async () => {
     try {
@@ -91,10 +92,18 @@ export default function GMPage() {
             filter: `season_id=eq.${seasonId}`,
           },
           () => {
-            fetch(`/api/campaign/events?seasonId=${seasonId}&status=all`)
-              .then((res) => res.json())
-              .then((data) => setEvents(data.events || []))
-              .catch(console.error);
+            // Debounce rapid updates
+            setDebounceTimer((prevTimer) => {
+              if (prevTimer) {
+                clearTimeout(prevTimer);
+              }
+              return setTimeout(() => {
+                fetch(`/api/campaign/events?seasonId=${seasonId}&status=all`)
+                  .then((res) => res.json())
+                  .then((data) => setEvents(data.events || []))
+                  .catch(console.error);
+              }, 500);
+            });
           }
         )
         .on(
@@ -106,10 +115,18 @@ export default function GMPage() {
             filter: `season_id=eq.${seasonId}`,
           },
           () => {
-            fetch(`/api/projects?seasonId=${seasonId}`)
-              .then((res) => res.json())
-              .then((data) => setProjects(data.projects || []))
-              .catch(console.error);
+            // Debounce rapid updates
+            setDebounceTimer((prevTimer) => {
+              if (prevTimer) {
+                clearTimeout(prevTimer);
+              }
+              return setTimeout(() => {
+                fetch(`/api/projects?seasonId=${seasonId}`)
+                  .then((res) => res.json())
+                  .then((data) => setProjects(data.projects || []))
+                  .catch(console.error);
+              }, 500);
+            });
           }
         )
         .on(
@@ -121,16 +138,30 @@ export default function GMPage() {
             filter: `season_id=eq.${seasonId}`,
           },
           () => {
-            fetch(`/api/reveal?seasonId=${seasonId}`)
-              .then((res) => res.json())
-              .then((data) => setReveals(data.reveals || []))
-              .catch(console.error);
+            // Debounce rapid updates
+            setDebounceTimer((prevTimer) => {
+              if (prevTimer) {
+                clearTimeout(prevTimer);
+              }
+              return setTimeout(() => {
+                fetch(`/api/reveal?seasonId=${seasonId}`)
+                  .then((res) => res.json())
+                  .then((data) => setReveals(data.reveals || []))
+                  .catch(console.error);
+              }, 500);
+            });
           }
         )
         .subscribe();
 
       return () => {
         try {
+          setDebounceTimer((prevTimer) => {
+            if (prevTimer) {
+              clearTimeout(prevTimer);
+            }
+            return null;
+          });
           supabase.removeChannel(channel);
         } catch {
           // Ignore cleanup errors

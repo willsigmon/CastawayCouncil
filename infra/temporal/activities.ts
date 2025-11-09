@@ -497,7 +497,7 @@ export async function advanceProjects(input: { seasonId: string; day: number }):
 export async function tickResources(input: { seasonId: string; day: number }): Promise<void> {
   try {
     const { updateInventory, getOrCreateInventory } = await import("../../app/_server/db/helpers");
-    
+
     // Get all inventories for this season
     const seasonInventories = await db
       .select()

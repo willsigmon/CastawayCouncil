@@ -36,4 +36,3 @@ CREATE INDEX IF NOT EXISTS narrative_arcs_progress_idx ON narrative_arcs(progres
 CREATE INDEX IF NOT EXISTS campaign_events_list_idx ON campaign_events(season_id, status, created_at DESC);
 CREATE INDEX IF NOT EXISTS projects_list_idx ON projects(season_id, status, created_at DESC);
 CREATE INDEX IF NOT EXISTS trades_list_idx ON trades(season_id, status, created_at DESC);
-

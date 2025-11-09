@@ -23,4 +23,3 @@ CREATE POLICY "Users can manage their own notification preferences"
   ON notification_preferences
   FOR ALL
   USING (user_id IN (SELECT id FROM users WHERE id = auth.uid()));
-

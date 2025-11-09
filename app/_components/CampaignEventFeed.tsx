@@ -98,13 +98,14 @@ export function CampaignEventFeed({
           },
           () => {
             // Debounce rapid updates
-            if (debounceTimer) {
-              clearTimeout(debounceTimer);
-            }
-            const timer = setTimeout(() => {
-              fetchEvents(0, false);
-            }, 500);
-            setDebounceTimer(timer);
+            setDebounceTimer((prevTimer) => {
+              if (prevTimer) {
+                clearTimeout(prevTimer);
+              }
+              return setTimeout(() => {
+                fetchEvents(0, false);
+              }, 500);
+            });
           }
         )
         .subscribe();
