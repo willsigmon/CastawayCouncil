@@ -381,22 +381,21 @@ export async function triggerCampaignEvent(eventId: string, triggeredBy: string 
 
   // Emit push notification for campaign event
   // Only import if available (infra directory may not be present in Vercel builds)
-  if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_TEMPORAL === 'true') {
-    try {
-      // Use dynamic import with a path that webpack can't statically analyze
-      const activitiesPath = '../../infra/temporal/activities';
-      const activities = await import(/* webpackIgnore: true */ activitiesPath);
-      if (activities?.emitPush) {
-        await activities.emitPush({
-          seasonId: event.seasonId,
-          type: "campaign_event",
-          campaignEventId: event.id,
-        });
-      }
-    } catch (error) {
-      // Silently fail if temporal activities aren't available
-      console.debug("Temporal activities not available:", error);
+  try {
+    // Use Function constructor to create a dynamic import that webpack can't statically analyze
+    const importPath = '../../infra/temporal/activities';
+    const importFunc = new Function('path', 'return import(path)');
+    const activities = await importFunc(importPath);
+    if (activities?.emitPush) {
+      await activities.emitPush({
+        seasonId: event.seasonId,
+        type: "campaign_event",
+        campaignEventId: event.id,
+      });
     }
+  } catch (error) {
+    // Silently fail if temporal activities aren't available (expected in Vercel builds)
+    // This is expected when infra/ directory is excluded by .vercelignore
   }
 
   return event;
@@ -497,22 +496,21 @@ export async function contributeToProject(
 
     // Emit push notification for project completion
     // Only import if available (infra directory may not be present in Vercel builds)
-    if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_TEMPORAL === 'true') {
-      try {
-        // Use dynamic import with a path that webpack can't statically analyze
-        const activitiesPath = '../../infra/temporal/activities';
-        const activities = await import(/* webpackIgnore: true */ activitiesPath);
-        if (activities?.emitPush) {
-          await activities.emitPush({
-            seasonId: project.seasonId,
-            type: "project_completed",
-            projectId: project.id,
-          });
-        }
-      } catch (error) {
-        // Silently fail if temporal activities aren't available
-        console.debug("Temporal activities not available:", error);
+    try {
+      // Use Function constructor to create a dynamic import that webpack can't statically analyze
+      const importPath = '../../infra/temporal/activities';
+      const importFunc = new Function('path', 'return import(path)');
+      const activities = await importFunc(importPath);
+      if (activities?.emitPush) {
+        await activities.emitPush({
+          seasonId: project.seasonId,
+          type: "project_completed",
+          projectId: project.id,
+        });
       }
+    } catch (error) {
+      // Silently fail if temporal activities aren't available (expected in Vercel builds)
+      // This is expected when infra/ directory is excluded by .vercelignore
     }
   }
 
@@ -704,22 +702,21 @@ export async function revealContent(revealId: string, revealContentJson: Record<
 
   // Emit push notification for reveal
   // Only import if available (infra directory may not be present in Vercel builds)
-  if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_TEMPORAL === 'true') {
-    try {
-      // Use dynamic import with a path that webpack can't statically analyze
-      const activitiesPath = '../../infra/temporal/activities';
-      const activities = await import(/* webpackIgnore: true */ activitiesPath);
-      if (activities?.emitPush) {
-        await activities.emitPush({
-          seasonId: reveal.seasonId,
-          type: "reveal_revealed",
-          revealId: reveal.id,
-        });
-      }
-    } catch (error) {
-      // Silently fail if temporal activities aren't available
-      console.debug("Temporal activities not available:", error);
+  try {
+    // Use Function constructor to create a dynamic import that webpack can't statically analyze
+    const importPath = '../../infra/temporal/activities';
+    const importFunc = new Function('path', 'return import(path)');
+    const activities = await importFunc(importPath);
+    if (activities?.emitPush) {
+      await activities.emitPush({
+        seasonId: reveal.seasonId,
+        type: "reveal_revealed",
+        revealId: reveal.id,
+      });
     }
+  } catch (error) {
+    // Silently fail if temporal activities aren't available (expected in Vercel builds)
+    // This is expected when infra/ directory is excluded by .vercelignore
   }
 
   return reveal;
