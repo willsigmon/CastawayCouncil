@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useInView } from "framer-motion";
-import { useRef, ReactNode } from "react";
+import React, { useRef, ReactNode } from "react";
 
 interface TextRevealProps {
   children: ReactNode;
