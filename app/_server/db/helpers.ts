@@ -393,7 +393,7 @@ export async function triggerCampaignEvent(eventId: string, triggeredBy: string 
         campaignEventId: event.id,
       });
     }
-  } catch (_error) {
+  } catch {
     // Silently fail if temporal activities aren't available (expected in Vercel builds)
     // This is expected when infra/ directory is excluded by .vercelignore
   }
@@ -509,7 +509,7 @@ export async function contributeToProject(
           projectId: project.id,
         });
       }
-    } catch (_error) {
+    } catch {
       // Silently fail if temporal activities aren't available (expected in Vercel builds)
       // This is expected when infra/ directory is excluded by .vercelignore
     }
@@ -716,10 +716,10 @@ export async function revealContent(revealId: string, revealContentJson: Record<
         revealId: reveal.id,
       });
     }
-  } catch (_error) {
-      // Silently fail if temporal activities aren't available (expected in Vercel builds)
-      // This is expected when infra/ directory is excluded by .vercelignore
-    }
+  } catch {
+    // Silently fail if temporal activities aren't available (expected in Vercel builds)
+    // This is expected when infra/ directory is excluded by .vercelignore
+  }
 
   return reveal;
 }
