@@ -52,8 +52,8 @@ export async function POST(request: NextRequest) {
       name: data.name,
       description: data.description,
       targetProgress: data.targetProgress,
-      requiredResourcesJson: data.requiredResourcesJson,
-      completionRewardsJson: data.completionRewardsJson,
+      requiredResourcesJson: data.requiredResourcesJson as Record<string, number> | undefined,
+      completionRewardsJson: data.completionRewardsJson as { statDeltas?: Record<string, number>; items?: string[] } | undefined,
     });
 
     return NextResponse.json({ project });
