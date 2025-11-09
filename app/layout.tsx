@@ -4,6 +4,8 @@ import { Header } from "./_components/Header";
 import { SeasonProvider } from "./_components/SeasonContext";
 import { PhaseIndicator } from "./_components/PhaseIndicator";
 import { ErrorBoundary } from "./_components/ErrorBoundary";
+import { ToastProvider } from "./_components/Toast";
+import { SkipToContent } from "./_components/SkipToContent";
 
 export const metadata: Metadata = {
   title: "Castaway Council",
@@ -24,11 +26,14 @@ export default function RootLayout({
       </head>
       <body>
         <ErrorBoundary>
-          <SeasonProvider>
-            <Header />
-            <PhaseIndicator />
-            {children}
-          </SeasonProvider>
+          <ToastProvider>
+            <SeasonProvider>
+              <SkipToContent />
+              <Header />
+              <PhaseIndicator />
+              <main id="main-content">{children}</main>
+            </SeasonProvider>
+          </ToastProvider>
         </ErrorBoundary>
       </body>
     </html>
