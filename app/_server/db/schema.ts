@@ -28,6 +28,30 @@ export const eventKindEnum = pgEnum("event_kind", [
   "medevac",
 ]);
 export const applicationStatusEnum = pgEnum("application_status", ["shortlist", "not_considered"]);
+export const campaignEventTypeEnum = pgEnum("campaign_event_type", [
+  "storm",
+  "supply_drop",
+  "wildlife_encounter",
+  "tribe_swap",
+  "exile_island",
+  "reward_challenge",
+  "immunity_idol_clue",
+  "social_twist",
+  "resource_discovery",
+  "custom",
+]);
+export const projectStatusEnum = pgEnum("project_status", ["planning", "active", "completed", "abandoned"]);
+export const resourceTypeEnum = pgEnum("resource_type", [
+  "food",
+  "water",
+  "materials",
+  "tools",
+  "medicine",
+  "luxury",
+]);
+export const revealStatusEnum = pgEnum("reveal_status", ["pending", "committed", "revealed", "verified"]);
+export const tradeStatusEnum = pgEnum("trade_status", ["pending", "accepted", "rejected", "cancelled"]);
+export const craftingRecipeStatusEnum = pgEnum("crafting_recipe_status", ["discovered", "hidden"]);
 
 // Tables
 export const users = pgTable("users", {
@@ -86,6 +110,7 @@ export const players = pgTable(
     evacuationReason: text("evacuation_reason"), // 'inactivity' | 'medical'
     lastActiveAt: timestamp("last_active_at").defaultNow().notNull(),
     role: playerRoleEnum("role").notNull().default("contestant"),
+    isGM: boolean("is_gm").notNull().default(false),
   },
   (table) => ({
     userIdIdx: index("players_user_id_idx").on(table.userId),
@@ -365,6 +390,247 @@ export const juryQuestions = pgTable(
   })
 );
 
+// Campaign Events - GM-injected events that affect gameplay
+export const campaignEvents = pgTable(
+  "campaign_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    seasonId: uuid("season_id").notNull().references(() => seasons.id),
+    type: campaignEventTypeEnum("type").notNull(),
+    title: text("title").notNull(),
+    description: text("description").notNull(),
+    scheduledDay: integer("scheduled_day"),
+    scheduledPhase: text("scheduled_phase"), // 'camp' | 'challenge' | 'vote' | null (immediate)
+    triggeredAt: timestamp("triggered_at"),
+    triggeredBy: uuid("triggered_by").references(() => players.id), // GM player ID
+    payloadJson: jsonb("payload_json"), // Event-specific data
+    statEffectsJson: jsonb("stat_effects_json"), // { playerId: { energy: -10, hunger: 5 } }
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    seasonIdx: index("campaign_events_season_idx").on(table.seasonId),
+    scheduledIdx: index("campaign_events_scheduled_idx").on(table.scheduledDay, table.scheduledPhase),
+    triggeredIdx: index("campaign_events_triggered_idx").on(table.triggeredAt),
+  })
+);
+
+// Event Templates - Reusable event definitions
+export const eventTemplates = pgTable("event_templates", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  type: campaignEventTypeEnum("type").notNull(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  defaultPayloadJson: jsonb("default_payload_json"),
+  defaultStatEffectsJson: jsonb("default_stat_effects_json"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Projects - Long-term tribe/player projects (shelters, tools, etc.)
+export const projects = pgTable(
+  "projects",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    seasonId: uuid("season_id").notNull().references(() => seasons.id),
+    tribeId: uuid("tribe_id").references(() => tribes.id), // null for player projects
+    playerId: uuid("player_id").references(() => players.id), // null for tribe projects
+    name: text("name").notNull(),
+    description: text("description").notNull(),
+    status: projectStatusEnum("status").notNull().default("planning"),
+    progress: integer("progress").notNull().default(0), // 0-100
+    targetProgress: integer("target_progress").notNull().default(100),
+    requiredResourcesJson: jsonb("required_resources_json"), // { resourceType: quantity }
+    completionRewardsJson: jsonb("completion_rewards_json"), // { statDeltas: {...}, items: [...] }
+    startedAt: timestamp("started_at"),
+    completedAt: timestamp("completed_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    seasonIdx: index("projects_season_idx").on(table.seasonId),
+    tribeIdx: index("projects_tribe_idx").on(table.tribeId),
+    playerIdx: index("projects_player_idx").on(table.playerId),
+  })
+);
+
+// Project Contributions - Track player contributions to projects
+export const projectContributions = pgTable(
+  "project_contributions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    playerId: uuid("player_id")
+      .notNull()
+      .references(() => players.id, { onDelete: "cascade" }),
+    day: integer("day").notNull(),
+    resourcesContributedJson: jsonb("resources_contributed_json"), // { resourceType: quantity }
+    progressAdded: integer("progress_added").notNull().default(0),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    projectIdx: index("project_contributions_project_idx").on(table.projectId),
+    playerDayIdx: index("project_contributions_player_day_idx").on(table.playerId, table.day),
+  })
+);
+
+// Resources - Inventory items (food, water, materials, etc.)
+export const resources = pgTable("resources", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  seasonId: uuid("season_id").notNull().references(() => seasons.id),
+  type: resourceTypeEnum("type").notNull(),
+  name: text("name").notNull(),
+  description: text("description"),
+  stackable: boolean("stackable").notNull().default(true),
+  perishable: boolean("perishable").notNull().default(false),
+  expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Inventories - Player/tribe resource holdings
+export const inventories = pgTable(
+  "inventories",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    seasonId: uuid("season_id").notNull().references(() => seasons.id),
+    tribeId: uuid("tribe_id").references(() => tribes.id), // null for player inventory
+    playerId: uuid("player_id").references(() => players.id), // null for tribe inventory
+    resourceId: uuid("resource_id")
+      .notNull()
+      .references(() => resources.id, { onDelete: "cascade" }),
+    quantity: integer("quantity").notNull().default(1),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    ownerIdx: index("inventories_owner_idx").on(table.tribeId, table.playerId),
+    resourceIdx: index("inventories_resource_idx").on(table.resourceId),
+    seasonIdx: index("inventories_season_idx").on(table.seasonId),
+  })
+);
+
+// Resource Transactions - Audit trail for resource changes
+export const resourceTransactions = pgTable(
+  "resource_transactions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    seasonId: uuid("season_id").notNull().references(() => seasons.id),
+    inventoryId: uuid("inventory_id")
+      .notNull()
+      .references(() => inventories.id, { onDelete: "cascade" }),
+    resourceId: uuid("resource_id")
+      .notNull()
+      .references(() => resources.id),
+    quantityDelta: integer("quantity_delta").notNull(), // positive for gain, negative for loss
+    reason: text("reason").notNull(), // 'forage', 'project_contribution', 'campaign_event', 'trade', etc.
+    relatedEntityType: text("related_entity_type"), // 'action', 'project', 'event', 'trade'
+    relatedEntityId: uuid("related_entity_id"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    inventoryIdx: index("resource_transactions_inventory_idx").on(table.inventoryId),
+    seasonIdx: index("resource_transactions_season_idx").on(table.seasonId),
+  })
+);
+
+// Reveals - Commit-reveal protocol for GM-controlled reveals
+export const reveals = pgTable(
+  "reveals",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    seasonId: uuid("season_id").notNull().references(() => seasons.id),
+    type: text("type").notNull(), // 'idol_location', 'tribe_swap', 'immunity', 'custom'
+    title: text("title").notNull(),
+    description: text("description"),
+    status: revealStatusEnum("status").notNull().default("pending"),
+    commitHash: text("commit_hash"), // SHA256 hash of reveal content
+    revealContentJson: jsonb("reveal_content_json"), // Revealed after commit phase
+    scheduledDay: integer("scheduled_day"),
+    scheduledPhase: text("scheduled_phase"),
+    revealedAt: timestamp("revealed_at"),
+    revealedBy: uuid("revealed_by").references(() => players.id), // GM player ID
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    seasonIdx: index("reveals_season_idx").on(table.seasonId),
+    statusIdx: index("reveals_status_idx").on(table.status),
+    scheduledIdx: index("reveals_scheduled_idx").on(table.scheduledDay, table.scheduledPhase),
+  })
+);
+
+// Narrative Arcs - Persistent character development tracking
+export const narrativeArcs = pgTable(
+  "narrative_arcs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    seasonId: uuid("season_id").notNull().references(() => seasons.id),
+    playerId: uuid("player_id")
+      .notNull()
+      .references(() => players.id, { onDelete: "cascade" }),
+    arcType: text("arc_type").notNull(), // 'redemption', 'villain', 'underdog', 'leader', 'social', 'custom'
+    title: text("title").notNull(),
+    description: text("description"),
+    progress: integer("progress").notNull().default(0), // 0-100
+    milestonesJson: jsonb("milestones_json"), // [{ day: 5, event: "...", progress: 25 }]
+    isActive: boolean("is_active").notNull().default(true),
+    startedAt: timestamp("started_at").defaultNow().notNull(),
+    completedAt: timestamp("completed_at"),
+  },
+  (table) => ({
+    playerIdx: index("narrative_arcs_player_idx").on(table.playerId),
+    seasonIdx: index("narrative_arcs_season_idx").on(table.seasonId),
+    activeIdx: index("narrative_arcs_active_idx").on(table.isActive),
+  })
+);
+
+// Trades - Player-to-player and tribe resource trading
+export const trades = pgTable(
+  "trades",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    seasonId: uuid("season_id").notNull().references(() => seasons.id),
+    proposerId: uuid("proposer_id").notNull().references(() => players.id),
+    recipientId: uuid("recipient_id").notNull().references(() => players.id),
+    proposerTribeId: uuid("proposer_tribe_id").references(() => tribes.id), // null for player trades
+    recipientTribeId: uuid("recipient_tribe_id").references(() => tribes.id), // null for player trades
+    resourcesOfferedJson: jsonb("resources_offered_json").notNull(), // { resourceId: quantity }
+    resourcesRequestedJson: jsonb("resources_requested_json").notNull(), // { resourceId: quantity }
+    status: tradeStatusEnum("status").notNull().default("pending"),
+    message: text("message"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    acceptedAt: timestamp("accepted_at"),
+    rejectedAt: timestamp("rejected_at"),
+    cancelledAt: timestamp("cancelled_at"),
+  },
+  (table) => ({
+    seasonIdx: index("trades_season_idx").on(table.seasonId),
+    proposerIdx: index("trades_proposer_idx").on(table.proposerId),
+    recipientIdx: index("trades_recipient_idx").on(table.recipientId),
+    statusIdx: index("trades_status_idx").on(table.status),
+  })
+);
+
+// Crafting Recipes - Define recipes for crafting items
+export const craftingRecipes = pgTable(
+  "crafting_recipes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    seasonId: uuid("season_id").notNull().references(() => seasons.id),
+    name: text("name").notNull(),
+    description: text("description"),
+    inputsJson: jsonb("inputs_json").notNull(), // { resourceId: quantity }
+    outputsJson: jsonb("outputs_json").notNull(), // { resourceId: quantity }
+    craftingTime: integer("crafting_time").notNull().default(1), // days
+    skillRequirementsJson: jsonb("skill_requirements_json"), // { archetype: bonus }
+    status: craftingRecipeStatusEnum("status").notNull().default("discovered"),
+    prerequisiteRecipeId: uuid("prerequisite_recipe_id").references(() => craftingRecipes.id),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    seasonIdx: index("crafting_recipes_season_idx").on(table.seasonId),
+    statusIdx: index("crafting_recipes_status_idx").on(table.status),
+  })
+);
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   players: many(players),
@@ -382,6 +648,14 @@ export const seasonsRelations = relations(seasons, ({ many }) => ({
   messages: many(messages),
   debuffs: many(debuffs),
   actions: many(actions),
+  campaignEvents: many(campaignEvents),
+  projects: many(projects),
+  resources: many(resources),
+  inventories: many(inventories),
+  reveals: many(reveals),
+  narrativeArcs: many(narrativeArcs),
+  trades: many(trades),
+  craftingRecipes: many(craftingRecipes),
 }));
 
 export const playersRelations = relations(players, ({ one, many }) => ({
@@ -398,6 +672,14 @@ export const playersRelations = relations(players, ({ one, many }) => ({
   actions: many(actions),
   votesCast: many(votes, { relationName: "votesCast" }),
   votesReceived: many(votes, { relationName: "votesReceived" }),
+  projects: many(projects),
+  projectContributions: many(projectContributions),
+  inventories: many(inventories),
+  narrativeArcs: many(narrativeArcs),
+  triggeredEvents: many(campaignEvents, { relationName: "triggeredEvents" }),
+  revealedReveals: many(reveals, { relationName: "revealedReveals" }),
+  tradesProposed: many(trades, { relationName: "tradesProposed" }),
+  tradesReceived: many(trades, { relationName: "tradesReceived" }),
 }));
 
 export const debuffsRelations = relations(debuffs, ({ one }) => ({
@@ -430,5 +712,155 @@ export const playerApplicationsRelations = relations(playerApplications, ({ one 
   user: one(users, {
     fields: [playerApplications.userId],
     references: [users.id],
+  }),
+}));
+
+export const tribesRelations = relations(tribes, ({ one, many }) => ({
+  season: one(seasons, {
+    fields: [tribes.seasonId],
+    references: [seasons.id],
+  }),
+  members: many(tribeMembers),
+  projects: many(projects),
+  inventories: many(inventories),
+}));
+
+export const projectsRelations = relations(projects, ({ one, many }) => ({
+  season: one(seasons, {
+    fields: [projects.seasonId],
+    references: [seasons.id],
+  }),
+  tribe: one(tribes, {
+    fields: [projects.tribeId],
+    references: [tribes.id],
+  }),
+  player: one(players, {
+    fields: [projects.playerId],
+    references: [players.id],
+  }),
+  contributions: many(projectContributions),
+}));
+
+export const projectContributionsRelations = relations(projectContributions, ({ one }) => ({
+  project: one(projects, {
+    fields: [projectContributions.projectId],
+    references: [projects.id],
+  }),
+  player: one(players, {
+    fields: [projectContributions.playerId],
+    references: [players.id],
+  }),
+}));
+
+export const resourcesRelations = relations(resources, ({ one, many }) => ({
+  season: one(seasons, {
+    fields: [resources.seasonId],
+    references: [seasons.id],
+  }),
+  inventories: many(inventories),
+  transactions: many(resourceTransactions),
+}));
+
+export const inventoriesRelations = relations(inventories, ({ one, many }) => ({
+  season: one(seasons, {
+    fields: [inventories.seasonId],
+    references: [seasons.id],
+  }),
+  tribe: one(tribes, {
+    fields: [inventories.tribeId],
+    references: [tribes.id],
+  }),
+  player: one(players, {
+    fields: [inventories.playerId],
+    references: [players.id],
+  }),
+  resource: one(resources, {
+    fields: [inventories.resourceId],
+    references: [resources.id],
+  }),
+  transactions: many(resourceTransactions),
+}));
+
+export const resourceTransactionsRelations = relations(resourceTransactions, ({ one }) => ({
+  season: one(seasons, {
+    fields: [resourceTransactions.seasonId],
+    references: [seasons.id],
+  }),
+  inventory: one(inventories, {
+    fields: [resourceTransactions.inventoryId],
+    references: [inventories.id],
+  }),
+  resource: one(resources, {
+    fields: [resourceTransactions.resourceId],
+    references: [resources.id],
+  }),
+}));
+
+export const campaignEventsRelations = relations(campaignEvents, ({ one }) => ({
+  season: one(seasons, {
+    fields: [campaignEvents.seasonId],
+    references: [seasons.id],
+  }),
+  triggeredByPlayer: one(players, {
+    fields: [campaignEvents.triggeredBy],
+    references: [players.id],
+  }),
+}));
+
+export const revealsRelations = relations(reveals, ({ one }) => ({
+  season: one(seasons, {
+    fields: [reveals.seasonId],
+    references: [seasons.id],
+  }),
+  revealedByPlayer: one(players, {
+    fields: [reveals.revealedBy],
+    references: [players.id],
+  }),
+}));
+
+export const narrativeArcsRelations = relations(narrativeArcs, ({ one }) => ({
+  season: one(seasons, {
+    fields: [narrativeArcs.seasonId],
+    references: [seasons.id],
+  }),
+  player: one(players, {
+    fields: [narrativeArcs.playerId],
+    references: [players.id],
+  }),
+}));
+
+export const tradesRelations = relations(trades, ({ one }) => ({
+  season: one(seasons, {
+    fields: [trades.seasonId],
+    references: [seasons.id],
+  }),
+  proposer: one(players, {
+    fields: [trades.proposerId],
+    references: [players.id],
+    relationName: "tradesProposed",
+  }),
+  recipient: one(players, {
+    fields: [trades.recipientId],
+    references: [players.id],
+    relationName: "tradesReceived",
+  }),
+  proposerTribe: one(tribes, {
+    fields: [trades.proposerTribeId],
+    references: [tribes.id],
+  }),
+  recipientTribe: one(tribes, {
+    fields: [trades.recipientTribeId],
+    references: [tribes.id],
+  }),
+}));
+
+export const craftingRecipesRelations = relations(craftingRecipes, ({ one, many }) => ({
+  season: one(seasons, {
+    fields: [craftingRecipes.seasonId],
+    references: [seasons.id],
+  }),
+  prerequisite: one(craftingRecipes, {
+    fields: [craftingRecipes.prerequisiteRecipeId],
+    references: [craftingRecipes.id],
   }),
 }));

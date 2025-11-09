@@ -369,3 +369,148 @@ export function determineSuccessLevel(roll: number, threshold: number): SuccessL
   if (difference >= -40) return "failure";
   return "critical_failure";
 }
+
+// ========== Narrative Arc Progression ==========
+
+export type ArcType = "redemption" | "villain" | "underdog" | "leader" | "social" | "custom";
+
+export interface ArcMilestone {
+  day: number;
+  event: string;
+  progress: number;
+}
+
+export interface NarrativeArcState {
+  arcType: ArcType;
+  progress: number; // 0-100
+  milestones: ArcMilestone[];
+  isActive: boolean;
+}
+
+/**
+ * Calculate arc progress based on player actions and events
+ */
+export function calculateArcProgress(
+  arcType: ArcType,
+  actions: Array<{ type: string; successLevel: SuccessLevel; day: number }>,
+  events: Array<{ type: string; day: number }>
+): number {
+  let progress = 0;
+
+  for (const action of actions) {
+    const contribution = getActionContribution(arcType, action.type, action.successLevel);
+    progress += contribution;
+  }
+
+  for (const event of events) {
+    const contribution = getEventContribution(arcType, event.type);
+    progress += contribution;
+  }
+
+  return Math.min(100, Math.max(0, progress));
+}
+
+function getActionContribution(arcType: ArcType, actionType: string, successLevel: SuccessLevel): number {
+  const baseContributions: Record<ArcType, Record<string, number>> = {
+    redemption: {
+      help: 2,
+      rest: 1,
+    },
+    villain: {
+      help: -1, // Helping others doesn't fit villain arc
+      rest: 0.5,
+    },
+    underdog: {
+      forage: 1.5,
+      fish: 1.5,
+      water: 1,
+      rest: 0.5,
+    },
+    leader: {
+      help: 3,
+      build: 2,
+      explore: 1,
+    },
+    social: {
+      help: 2.5,
+      rest: 1,
+    },
+    custom: {
+      help: 1,
+      rest: 0.5,
+    },
+  };
+
+  const base = baseContributions[arcType]?.[actionType] || 0;
+  const multiplier = successLevel === "critical_success" ? 2 : successLevel === "success" ? 1.5 : successLevel === "partial" ? 0.5 : 0;
+  return base * multiplier;
+}
+
+function getEventContribution(arcType: ArcType, eventType: string): number {
+  const contributions: Record<ArcType, Record<string, number>> = {
+    redemption: {
+      supply_drop: 5,
+      reward_challenge: 3,
+    },
+    villain: {
+      social_twist: 5,
+      tribe_swap: 3,
+    },
+    underdog: {
+      reward_challenge: 5,
+      immunity_idol_clue: 3,
+    },
+    leader: {
+      tribe_swap: 5,
+      social_twist: 3,
+    },
+    social: {
+      social_twist: 5,
+      tribe_swap: 4,
+    },
+    custom: {},
+  };
+
+  return contributions[arcType]?.[eventType] || 0;
+}
+
+/**
+ * Generate narrative text for arc milestone
+ */
+export function generateArcMilestoneText(arcType: ArcType, progress: number, milestone: ArcMilestone): string {
+  const templates: Record<ArcType, string[]> = {
+    redemption: [
+      `{name} took another step toward redemption on day ${milestone.day}. ${milestone.event}`,
+      `The path to redemption continues. On day ${milestone.day}, {name} ${milestone.event}`,
+      `{name}'s journey of redemption reached ${progress}% completion. ${milestone.event}`,
+    ],
+    villain: [
+      `{name}'s villainous arc deepened on day ${milestone.day}. ${milestone.event}`,
+      `The villain's plan unfolds. On day ${milestone.day}, {name} ${milestone.event}`,
+      `{name}'s villain arc is ${progress}% complete. ${milestone.event}`,
+    ],
+    underdog: [
+      `{name} defied expectations on day ${milestone.day}. ${milestone.event}`,
+      `The underdog story continues. On day ${milestone.day}, {name} ${milestone.event}`,
+      `{name}'s underdog arc reached ${progress}% completion. ${milestone.event}`,
+    ],
+    leader: [
+      `{name} demonstrated leadership on day ${milestone.day}. ${milestone.event}`,
+      `Leadership qualities shine through. On day ${milestone.day}, {name} ${milestone.event}`,
+      `{name}'s leader arc is ${progress}% complete. ${milestone.event}`,
+    ],
+    social: [
+      `{name} strengthened social bonds on day ${milestone.day}. ${milestone.event}`,
+      `Social connections deepen. On day ${milestone.day}, {name} ${milestone.event}`,
+      `{name}'s social arc reached ${progress}% completion. ${milestone.event}`,
+    ],
+    custom: [
+      `{name}'s journey progressed on day ${milestone.day}. ${milestone.event}`,
+      `The story continues. On day ${milestone.day}, {name} ${milestone.event}`,
+      `{name}'s arc is ${progress}% complete. ${milestone.event}`,
+    ],
+  };
+
+  const templateList = templates[arcType] || templates.custom;
+  return templateList[Math.floor(Math.random() * templateList.length)].replace(/{name}/g, "{name}");
+}

@@ -7,6 +7,9 @@ const {
   tallyVotes,
   mergeTribes,
   emitDailySummary,
+  checkScheduledEvents,
+  advanceProjects,
+  tickResources,
 } = proxyActivities<typeof activities>({
   startToCloseTimeout: "1 minute",
 });
@@ -93,15 +96,20 @@ export async function seasonWorkflow(input: SeasonWorkflowInput): Promise<void> 
 
     // Camp phase
     await openPhase(seasonId, day, "camp", durations.camp);
+    await checkScheduledEvents({ seasonId, day, phase: "camp" });
+    await tickResources({ seasonId, day });
+    await advanceProjects({ seasonId, day });
     await sleep(durations.camp);
 
     // Challenge phase
     await openPhase(seasonId, day, "challenge", durations.challenge);
+    await checkScheduledEvents({ seasonId, day, phase: "challenge" });
     await sleep(durations.challenge);
     await scoreChallenge({ seasonId, day });
 
     // Vote phase
     await openPhase(seasonId, day, "vote", durations.vote);
+    await checkScheduledEvents({ seasonId, day, phase: "vote" });
     await sleep(durations.vote);
     await tallyVotes({ seasonId, day });
 

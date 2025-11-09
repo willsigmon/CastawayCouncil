@@ -2,6 +2,7 @@ import { createClient } from "@/app/_lib/supabase/server";
 import { db } from "@/server/db/client";
 import { players } from "@/server/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
+import { ApiError } from "./errors";
 
 export async function getServerSession() {
   const supabase = await createClient();
@@ -84,4 +85,16 @@ export async function requirePlayer(seasonId: string): Promise<string> {
     throw new Error("Player not found in season");
   }
   return playerId;
+}
+
+/**
+ * Require that the user is a GM in the given season
+ * Returns the player record, throws if not GM
+ */
+export async function requireGM(seasonId: string) {
+  const player = await getCurrentPlayer(seasonId);
+  if (!player.isGM) {
+    throw new ApiError("GM access required", 403);
+  }
+  return player;
 }

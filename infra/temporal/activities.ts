@@ -1,8 +1,24 @@
 import type { SeasonWorkflowInput } from "./workflows";
 import { db } from "../../app/_server/db/client";
-import { challenges, votes, events, players, tribes, tribeMembers, pushSubscriptions, items } from "../../app/_server/db/schema";
-import { eq, and, sql, isNull, desc } from "drizzle-orm";
+import {
+  challenges,
+  votes,
+  events,
+  players,
+  tribes,
+  tribeMembers,
+  pushSubscriptions,
+  items,
+  campaignEvents,
+  projects,
+  projectContributions,
+  resources,
+  inventories,
+  reveals,
+} from "../../app/_server/db/schema";
+import { eq, and, sql, isNull, desc, lt, gt } from "drizzle-orm";
 import webpush from "web-push";
+import { triggerCampaignEvent, getCampaignEvents } from "../../app/_server/db/helpers";
 
 // Configure webpush with VAPID keys
 if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY && process.env.VAPID_SUBJECT) {
@@ -19,6 +35,10 @@ export async function emitPush(input: {
   phase?: string;
   day?: number;
   closesAt?: string;
+  campaignEventId?: string;
+  projectId?: string;
+  revealId?: string;
+  resourceExpiration?: boolean;
 }): Promise<void> {
   try {
     // Emit phase_open event to DB if this is a phase event
@@ -35,13 +55,64 @@ export async function emitPush(input: {
       });
     }
 
-    // Get all players in season
+    // Get target users based on notification type
+    let userIds: string[] = [];
+
+    if (input.type === "campaign_event" && input.campaignEventId) {
+      // Campaign events: notify all season players
+      const seasonPlayers = await db
+        .select({ userId: players.userId })
+        .from(players)
+        .where(eq(players.seasonId, input.seasonId));
+      userIds = seasonPlayers.map((p) => p.userId);
+    } else if (input.type === "project_completed" && input.projectId) {
+      // Project completion: notify project contributors
+      const [project] = await db.select().from(projects).where(eq(projects.id, input.projectId)).limit(1);
+      if (project) {
+        const contributors = await db
+          .select({ playerId: projectContributions.playerId })
+          .from(projectContributions)
+          .where(eq(projectContributions.projectId, input.projectId));
+        if (contributors.length > 0) {
+          const contributorIds = contributors.map((c) => c.playerId);
+          const contributorPlayers = await db
+            .select({ userId: players.userId })
+            .from(players)
+            .where(sql`${players.id} = ANY(${contributorIds})`);
+          userIds = contributorPlayers.map((p) => p.userId);
+        }
+      }
+    } else if (input.type === "reveal_revealed" && input.revealId) {
+      // Reveals: notify all season players
+      const seasonPlayers = await db
+        .select({ userId: players.userId })
+        .from(players)
+        .where(eq(players.seasonId, input.seasonId));
+      userIds = seasonPlayers.map((p) => p.userId);
+    } else if (input.type === "resource_expiration") {
+      // Resource expiration: notify inventory owners
+      const expiredInventories = await db
+        .select({ playerId: inventories.playerId, tribeId: inventories.tribeId })
+        .from(inventories)
+        .where(eq(inventories.seasonId, input.seasonId));
+      const ownerIds = expiredInventories
+        .map((inv) => inv.playerId || inv.tribeId)
+        .filter((id): id is string => !!id);
+      if (ownerIds.length > 0) {
+        const owners = await db
+          .select({ userId: players.userId })
+          .from(players)
+          .where(sql`${players.id} = ANY(${ownerIds})`);
+        userIds = owners.map((p) => p.userId);
+      }
+    } else {
+      // Default: all season players
     const seasonPlayers = await db
       .select({ userId: players.userId })
       .from(players)
       .where(eq(players.seasonId, input.seasonId));
-
-    const userIds = seasonPlayers.map((p) => p.userId);
+      userIds = seasonPlayers.map((p) => p.userId);
+    }
 
     if (userIds.length === 0) return;
 
@@ -50,6 +121,100 @@ export async function emitPush(input: {
       .select()
       .from(pushSubscriptions)
       .where(sql`${pushSubscriptions.userId} = ANY(${userIds})`);
+
+    // Build notification payload based on type with action buttons
+    let notificationPayload: {
+      title: string;
+      body: string;
+      icon: string;
+      data?: Record<string, unknown>;
+      actions?: Array<{ action: string; title: string; icon?: string }>;
+    } = {
+      title: "Castaway Council",
+      body: "Update available",
+      icon: "/icon-192x192.png",
+    };
+
+    if (input.type === "campaign_event" && input.campaignEventId) {
+      const [event] = await db
+        .select()
+        .from(campaignEvents)
+        .where(eq(campaignEvents.id, input.campaignEventId))
+        .limit(1);
+      if (event) {
+        const eventIcons: Record<string, string> = {
+          storm: "⛈️",
+          supply_drop: "📦",
+          wildlife_encounter: "🐍",
+          tribe_swap: "🔄",
+          exile_island: "🏝️",
+          reward_challenge: "🎁",
+          immunity_idol_clue: "💎",
+          social_twist: "🎭",
+          resource_discovery: "💎",
+        };
+        notificationPayload = {
+          title: `${eventIcons[event.type] || "✨"} ${event.title}`,
+          body: event.description,
+          icon: "/icon-192x192.png",
+          data: { type: "campaign_event", eventId: event.id, url: `/season/${input.seasonId}/log` },
+          actions: [
+            { action: "view", title: "View Event", icon: "/icon-192x192.png" },
+            { action: "dismiss", title: "Dismiss" },
+          ],
+        };
+      }
+    } else if (input.type === "project_completed" && input.projectId) {
+      const [project] = await db.select().from(projects).where(eq(projects.id, input.projectId)).limit(1);
+      if (project) {
+        notificationPayload = {
+          title: "🔨 Project Completed!",
+          body: `${project.name} has been completed!`,
+          icon: "/icon-192x192.png",
+          data: { type: "project_completed", projectId: project.id, url: `/season/${input.seasonId}` },
+          actions: [
+            { action: "view", title: "View Project", icon: "/icon-192x192.png" },
+            { action: "dismiss", title: "Dismiss" },
+          ],
+        };
+      }
+    } else if (input.type === "reveal_revealed" && input.revealId) {
+      const [reveal] = await db.select().from(reveals).where(eq(reveals.id, input.revealId)).limit(1);
+      if (reveal) {
+        notificationPayload = {
+          title: "💎 Reveal!",
+          body: `${reveal.title} has been revealed!`,
+          icon: "/icon-192x192.png",
+          data: { type: "reveal_revealed", revealId: reveal.id, url: `/season/${input.seasonId}/gm` },
+          actions: [
+            { action: "view", title: "View Reveal", icon: "/icon-192x192.png" },
+            { action: "dismiss", title: "Dismiss" },
+          ],
+        };
+      }
+    } else if (input.type === "resource_expiration") {
+      notificationPayload = {
+        title: "⚠️ Resource Expiring",
+        body: "Some of your resources are about to expire!",
+        icon: "/icon-192x192.png",
+        data: { type: "resource_expiration", url: `/season/${input.seasonId}` },
+        actions: [
+          { action: "view", title: "Check Inventory", icon: "/icon-192x192.png" },
+          { action: "dismiss", title: "Dismiss" },
+        ],
+      };
+    } else if (input.type === "phase_open" && input.phase) {
+      notificationPayload = {
+        title: `Phase: ${input.phase}`,
+        body: `${input.phase} phase started`,
+        icon: "/icon-192x192.png",
+        data: { type: "phase_open", phase: input.phase, url: `/season/${input.seasonId}` },
+        actions: [
+          { action: "view", title: "View Season", icon: "/icon-192x192.png" },
+          { action: "dismiss", title: "Dismiss" },
+        ],
+      };
+    }
 
     // Send notifications
     const notificationPromises = subscriptions.map(async (sub) => {
@@ -62,11 +227,7 @@ export async function emitPush(input: {
               auth: sub.auth,
             },
           },
-          JSON.stringify({
-            title: input.phase ? `Phase: ${input.phase}` : "Castaway Council",
-            body: input.type === "phase_open" ? `${input.phase} phase started` : "Update available",
-            icon: "/icon-192x192.png",
-          })
+          JSON.stringify(notificationPayload)
         );
       } catch (error) {
         // Ignore failed notifications (expired subscriptions, etc.)
@@ -282,5 +443,188 @@ export async function emitDailySummary(input: { seasonId: string; day: number })
     });
   } catch (error) {
     console.error("[Activity] Daily summary error:", error);
+  }
+}
+
+// ========== Campaign Event Activities ==========
+
+export async function checkScheduledEvents(input: { seasonId: string; day: number; phase: string }): Promise<void> {
+  try {
+    // Find events scheduled for this day/phase
+    const scheduledEvents = await db
+      .select()
+      .from(campaignEvents)
+      .where(
+        and(
+          eq(campaignEvents.seasonId, input.seasonId),
+          eq(campaignEvents.scheduledDay, input.day),
+          eq(campaignEvents.scheduledPhase, input.phase),
+          isNull(campaignEvents.triggeredAt)
+        )
+      );
+
+    // Trigger each scheduled event
+    for (const event of scheduledEvents) {
+      // Use system trigger (no player ID)
+      await triggerCampaignEvent(event.id, null);
+    }
+  } catch (error) {
+    console.error("[Activity] Check scheduled events error:", error);
+  }
+}
+
+export async function advanceProjects(input: { seasonId: string; day: number }): Promise<void> {
+  try {
+    // Get active projects
+    const activeProjects = await db
+      .select()
+      .from(projects)
+      .where(
+        and(
+          eq(projects.seasonId, input.seasonId),
+          eq(projects.status, "active")
+        )
+      );
+
+    // TODO: Apply passive progress based on project type, tribe size, etc.
+    // For now, this is a placeholder for future automation
+    console.log(`[Activity] Advancing ${activeProjects.length} active projects for day ${input.day}`);
+  } catch (error) {
+    console.error("[Activity] Advance projects error:", error);
+  }
+}
+
+export async function tickResources(input: { seasonId: string; day: number }): Promise<void> {
+  try {
+    const { updateInventory, getOrCreateInventory } = await import("../../app/_server/db/helpers");
+    
+    // Get all inventories for this season
+    const seasonInventories = await db
+      .select()
+      .from(inventories)
+      .where(eq(inventories.seasonId, input.seasonId));
+
+    // Apply maintenance costs (shelter maintenance, tool degradation, food/water consumption)
+    for (const inventory of seasonInventories) {
+      const [resource] = await db
+        .select()
+        .from(resources)
+        .where(eq(resources.id, inventory.resourceId))
+        .limit(1);
+
+      if (!resource) continue;
+
+      // Daily maintenance costs based on resource type
+      let maintenanceCost = 0;
+      if (resource.type === "materials" && inventory.quantity > 0) {
+        // Shelter maintenance: consume 1 material per day per 10 materials
+        maintenanceCost = Math.ceil(inventory.quantity / 10);
+      } else if (resource.type === "tools" && inventory.quantity > 0) {
+        // Tool degradation: 5% chance per tool to degrade
+        const degradationChance = inventory.quantity * 0.05;
+        if (Math.random() < degradationChance) {
+          maintenanceCost = 1;
+        }
+      } else if (resource.type === "food" && inventory.quantity > 0) {
+        // Food consumption: 1 food per player per day (simplified)
+        maintenanceCost = 1;
+      } else if (resource.type === "water" && inventory.quantity > 0) {
+        // Water consumption: 1 water per player per day
+        maintenanceCost = 1;
+      }
+
+      if (maintenanceCost > 0 && inventory.quantity >= maintenanceCost) {
+        await updateInventory({
+          inventoryId: inventory.id,
+          quantityDelta: -maintenanceCost,
+          reason: "maintenance",
+          relatedEntityType: "action",
+        });
+      }
+    }
+
+    // Get perishable resources
+    const perishableResources = await db
+      .select()
+      .from(resources)
+      .where(
+        and(
+          eq(resources.seasonId, input.seasonId),
+          eq(resources.perishable, true)
+        )
+      );
+
+    // Check expiration dates and reduce quantities
+    const now = new Date();
+    for (const resource of perishableResources) {
+      if (resource.expiresAt && resource.expiresAt < now) {
+        // Reduce inventory quantities for expired resources
+        const resourceInventories = await db
+          .select()
+          .from(inventories)
+          .where(eq(inventories.resourceId, resource.id));
+
+        for (const inventory of resourceInventories) {
+          if (inventory.quantity > 0) {
+            // Reduce by 50% each day after expiration
+            const newQuantity = Math.floor(inventory.quantity * 0.5);
+            await db
+              .update(inventories)
+              .set({ quantity: newQuantity, updatedAt: now })
+              .where(eq(inventories.id, inventory.id));
+
+            // Emit push notification for resource expiration warning
+            if (inventory.quantity > 0 && newQuantity <= inventory.quantity * 0.1) {
+              try {
+                await emitPush({
+                  seasonId: input.seasonId,
+                  type: "resource_expiration",
+                  resourceExpiration: true,
+                });
+              } catch (error) {
+                console.error("Failed to emit push notification for resource expiration:", error);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Check for resource scarcity events (random chance)
+    if (Math.random() < 0.1) {
+      // 10% chance per day for scarcity event
+      await checkResourceScarcity(input.seasonId, input.day);
+    }
+  } catch (error) {
+    console.error("[Activity] Tick resources error:", error);
+  }
+}
+
+async function checkResourceScarcity(seasonId: string, day: number) {
+  try {
+    // Randomly select a resource type to become scarce
+    const resourceTypes = ["food", "water", "materials", "tools", "medicine"];
+    const scarceType = resourceTypes[Math.floor(Math.random() * resourceTypes.length)];
+
+    // Create a scarcity campaign event
+    const { createCampaignEvent } = await import("../../app/_server/db/helpers");
+    await createCampaignEvent({
+      seasonId,
+      type: "resource_discovery", // Reuse existing type, could add "scarcity" type
+      title: `${scarceType.charAt(0).toUpperCase() + scarceType.slice(1)} Shortage`,
+      description: `A shortage of ${scarceType} has been discovered. Players will need to adapt their strategies.`,
+      payloadJson: { scarcityType: scarceType, day },
+      triggeredBy: null, // System-triggered
+    });
+
+    // Emit push notification
+    await emitPush({
+      seasonId,
+      type: "campaign_event",
+      day,
+      campaignEventId: undefined, // Will be set by createCampaignEvent
+    });
+  } catch (error) {
+    console.error("[Activity] Resource scarcity check error:", error);
   }
 }

@@ -1,51 +1,61 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-interface Event {
-  id: string;
-  kind: string;
-  day: number;
-  payloadJson: Record<string, unknown>;
-  createdAt: string;
-}
+import { useState } from "react";
+import { useParams } from "next/navigation";
+import { CampaignEventFeed } from "@/app/_components/CampaignEventFeed";
 
 export default function PublicLogPage() {
-  const [events, setEvents] = useState<Event[]>([]);
-  
-  // TODO: Use setEvents when implementing Realtime subscription
-  void setEvents;
-
-  useEffect(() => {
-    // TODO: Subscribe to season:{id}:public channel
-    // const channel = supabase
-    //   .channel('season:1:public')
-    //   .on('postgres_changes', { ... })
-    //   .subscribe();
-  }, []);
+  const params = useParams();
+  const seasonId = params.seasonId as string;
+  const [filterType, setFilterType] = useState<string>("");
+  const [filterPhase, setFilterPhase] = useState<"camp" | "challenge" | "vote" | "">("");
 
   return (
-    <div className="min-h-screen p-4">
-      <h1 className="text-2xl font-bold mb-4">Public Log</h1>
-      <div className="space-y-2">
-        {events.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">
-            No events yet. Events will appear here as the season progresses.
-          </p>
-        ) : (
-          events.map((event) => (
-            <div key={event.id} className="p-4 bg-gray-800 rounded">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs text-gray-400">Day {event.day}</span>
-                <span className="text-xs text-gray-500">
-                  {new Date(event.createdAt).toLocaleString()}
-                </span>
-              </div>
-              <p className="font-semibold capitalize">{event.kind.replace(/_/g, " ")}</p>
-            </div>
-          ))
-        )}
+    <div className="min-h-screen p-4 max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6 text-amber-100">Campaign Event Log</h1>
+
+      {/* Filters */}
+      <div className="mb-6 flex gap-4 flex-wrap">
+        <div>
+          <label className="block text-sm font-semibold text-stone-300 mb-2">Filter by Type</label>
+          <select
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value)}
+            className="px-3 py-2 bg-stone-800 border border-stone-700 rounded text-stone-100"
+          >
+            <option value="">All Types</option>
+            <option value="storm">⛈️ Storm</option>
+            <option value="supply_drop">📦 Supply Drop</option>
+            <option value="wildlife_encounter">🐍 Wildlife Encounter</option>
+            <option value="tribe_swap">🔄 Tribe Swap</option>
+            <option value="exile_island">🏝️ Exile Island</option>
+            <option value="reward_challenge">🎁 Reward Challenge</option>
+            <option value="immunity_idol_clue">💎 Immunity Idol Clue</option>
+            <option value="social_twist">🎭 Social Twist</option>
+            <option value="resource_discovery">💎 Resource Discovery</option>
+            <option value="custom">✨ Custom</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-stone-300 mb-2">Filter by Phase</label>
+          <select
+            value={filterPhase}
+            onChange={(e) => setFilterPhase(e.target.value as typeof filterPhase)}
+            className="px-3 py-2 bg-stone-800 border border-stone-700 rounded text-stone-100"
+          >
+            <option value="">All Phases</option>
+            <option value="camp">Camp</option>
+            <option value="challenge">Challenge</option>
+            <option value="vote">Vote</option>
+          </select>
+        </div>
       </div>
+
+      <CampaignEventFeed
+        seasonId={seasonId}
+        filterType={filterType || undefined}
+        filterPhase={filterPhase || undefined}
+      />
     </div>
   );
 }
