@@ -872,79 +872,83 @@ export async function acceptTrade(tradeId: string) {
   // Transfer from proposer to recipient (resourcesOffered)
   for (const [resourceId, quantity] of Object.entries(trade.resourcesOfferedJson as Record<string, number>)) {
     // Remove from proposer
-    await updateInventory({
-      inventoryId: (
-        await getOrCreateInventory(
-          trade.seasonId,
-          resourceId,
-          {
-            playerId: trade.proposerTribeId ? undefined : trade.proposerId,
-            tribeId: trade.proposerTribeId || undefined,
-          }
-        )
-      ).id,
-      quantityDelta: -quantity,
-      reason: "trade_offer",
-      relatedEntityType: "trade",
-      relatedEntityId: tradeId,
-    });
+    const proposerInventory = await getOrCreateInventory(
+      trade.seasonId,
+      resourceId,
+      {
+        playerId: trade.proposerTribeId ? undefined : trade.proposerId,
+        tribeId: trade.proposerTribeId || undefined,
+      }
+    );
+    await updateInventory(
+      proposerInventory.id,
+      -quantity,
+      "trade_offer",
+      {
+        relatedEntityType: "trade",
+        relatedEntityId: tradeId,
+      }
+    );
 
     // Add to recipient
-    await updateInventory({
-      inventoryId: (
-        await getOrCreateInventory(
-          trade.seasonId,
-          resourceId,
-          {
-            playerId: trade.recipientTribeId ? undefined : trade.recipientId,
-            tribeId: trade.recipientTribeId || undefined,
-          }
-        )
-      ).id,
-      quantityDelta: quantity,
-      reason: "trade_receive",
-      relatedEntityType: "trade",
-      relatedEntityId: tradeId,
-    });
+    const recipientInventory = await getOrCreateInventory(
+      trade.seasonId,
+      resourceId,
+      {
+        playerId: trade.recipientTribeId ? undefined : trade.recipientId,
+        tribeId: trade.recipientTribeId || undefined,
+      }
+    );
+    await updateInventory(
+      recipientInventory.id,
+      quantity,
+      "trade_receive",
+      {
+        relatedEntityType: "trade",
+        relatedEntityId: tradeId,
+      }
+    );
   }
 
   // Transfer from recipient to proposer (resourcesRequested)
   for (const [resourceId, quantity] of Object.entries(trade.resourcesRequestedJson as Record<string, number>)) {
     // Remove from recipient
-    await updateInventory({
-      inventoryId: (
-        await getOrCreateInventory(
-          trade.seasonId,
-          resourceId,
-          {
-            playerId: trade.recipientTribeId ? undefined : trade.recipientId,
-            tribeId: trade.recipientTribeId || undefined,
-          }
-        )
-      ).id,
-      quantityDelta: -quantity,
-      reason: "trade_offer",
-      relatedEntityType: "trade",
-      relatedEntityId: tradeId,
-    });
+    const recipientInventory = await getOrCreateInventory(
+      trade.seasonId,
+      resourceId,
+      {
+        playerId: trade.recipientTribeId ? undefined : trade.recipientId,
+        tribeId: trade.recipientTribeId || undefined,
+      }
+    );
+    await updateInventory(
+      recipientInventory.id,
+      -quantity,
+      "trade_offer",
+      {
+        relatedEntityType: "trade",
+        relatedEntityId: tradeId,
+      }
+    );
 
     // Add to proposer
-    await updateInventory({
-      inventoryId: (
-        await getOrCreateInventory(
-          trade.seasonId,
-          resourceId,
-          {
-            playerId: trade.proposerTribeId ? undefined : trade.proposerId,
-            tribeId: trade.proposerTribeId || undefined,
-          }
-        )
-      ).id,
-      quantityDelta: quantity,
-      reason: "trade_receive",
-      relatedEntityType: "trade",
-      relatedEntityId: tradeId,
-    });
+    const proposerInventory = await getOrCreateInventory(
+      trade.seasonId,
+      resourceId,
+      {
+        playerId: trade.proposerTribeId ? undefined : trade.proposerId,
+        tribeId: trade.proposerTribeId || undefined,
+      }
+    );
+    await updateInventory(
+      proposerInventory.id,
+      quantity,
+      "trade_receive",
+      {
+        relatedEntityType: "trade",
+        relatedEntityId: tradeId,
+      }
+    );
   }
 
   // Update trade status
@@ -1001,7 +1005,10 @@ export async function getTrades(seasonId: string, filters?: { playerId?: string;
   const conditions = [eq(trades.seasonId, seasonId)];
 
   if (filters?.playerId) {
-    conditions.push(or(eq(trades.proposerId, filters.playerId), eq(trades.recipientId, filters.playerId)));
+    const playerCondition = or(eq(trades.proposerId, filters.playerId), eq(trades.recipientId, filters.playerId));
+    if (playerCondition) {
+      conditions.push(playerCondition);
+    }
   }
   if (filters?.status) {
     conditions.push(eq(trades.status, filters.status as any));
@@ -1056,43 +1063,45 @@ export async function craftItem(
 
   // Consume inputs
   for (const [resourceId, quantity] of Object.entries(inputs)) {
-    await updateInventory({
-      inventoryId: (
-        await getOrCreateInventory(
-          seasonId,
-          resourceId,
-          {
-            playerId: tribeId ? undefined : playerId,
-            tribeId,
-          }
-        )
-      ).id,
-      quantityDelta: -quantity,
-      reason: "crafting",
-      relatedEntityType: "action",
-      relatedEntityId: recipeId,
-    });
+    const inventory = await getOrCreateInventory(
+      seasonId,
+      resourceId,
+      {
+        playerId: tribeId ? undefined : playerId,
+        tribeId,
+      }
+    );
+    await updateInventory(
+      inventory.id,
+      -quantity,
+      "crafting",
+      {
+        relatedEntityType: "action",
+        relatedEntityId: recipeId,
+      }
+    );
   }
 
   // Produce outputs
   const outputs = recipe.outputsJson as Record<string, number>;
   for (const [resourceId, quantity] of Object.entries(outputs)) {
-    await updateInventory({
-      inventoryId: (
-        await getOrCreateInventory(
-          seasonId,
-          resourceId,
-          {
-            playerId: tribeId ? undefined : playerId,
-            tribeId,
-          }
-        )
-      ).id,
-      quantityDelta: quantity,
-      reason: "crafting",
-      relatedEntityType: "action",
-      relatedEntityId: recipeId,
-    });
+    const inventory = await getOrCreateInventory(
+      seasonId,
+      resourceId,
+      {
+        playerId: tribeId ? undefined : playerId,
+        tribeId,
+      }
+    );
+    await updateInventory(
+      inventory.id,
+      quantity,
+      "crafting",
+      {
+        relatedEntityType: "action",
+        relatedEntityId: recipeId,
+      }
+    );
   }
 
   return { recipe, outputs };
