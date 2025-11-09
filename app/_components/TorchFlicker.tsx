@@ -33,4 +33,3 @@ export function TorchFlicker({ children, intensity = 1, className = "" }: TorchF
     </motion.div>
   );
 }
-

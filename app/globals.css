@@ -74,26 +74,57 @@ body {
       linear-gradient(90deg, rgba(212, 165, 116, 0.03) 1px, transparent 1px),
       linear-gradient(rgba(212, 165, 116, 0.03) 1px, transparent 1px);
     background-size: 20px 20px;
+    box-shadow: 
+      inset 0 1px 0 rgba(255, 200, 87, 0.1),
+      0 4px 6px -1px rgba(0, 0, 0, 0.3),
+      0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    position: relative;
+  }
+
+  .wood-panel::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 200, 87, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+    border-radius: inherit;
   }
 
   .torch-panel {
     @apply relative wood-panel;
+    box-shadow: 
+      inset 0 1px 0 rgba(255, 200, 87, 0.15),
+      0 8px 16px -4px rgba(255, 107, 53, 0.3),
+      0 4px 8px -2px rgba(255, 200, 87, 0.2),
+      0 0 0 1px rgba(255, 107, 53, 0.2);
   }
 
   .torch-panel::before {
     content: '';
     position: absolute;
-    top: -1px;
+    top: -2px;
     left: 0;
     right: 0;
-    height: 3px;
+    height: 4px;
     background: linear-gradient(90deg,
-      transparent 0%,
-      rgba(255, 107, 53, 0.5) 20%,
-      rgba(255, 200, 87, 0.7) 50%,
-      rgba(255, 107, 53, 0.5) 80%,
-      transparent 100%);
-    filter: blur(2px);
+        transparent 0%,
+        rgba(255, 107, 53, 0.6) 20%,
+        rgba(255, 200, 87, 0.8) 50%,
+        rgba(255, 107, 53, 0.6) 80%,
+        transparent 100%);
+    filter: blur(3px);
+    z-index: 1;
+  }
+
+  .torch-panel:hover {
+    box-shadow: 
+      inset 0 1px 0 rgba(255, 200, 87, 0.2),
+      0 12px 24px -4px rgba(255, 107, 53, 0.4),
+      0 6px 12px -2px rgba(255, 200, 87, 0.3),
+      0 0 0 1px rgba(255, 107, 53, 0.3);
   }
 
   .card-hover {
@@ -105,10 +136,27 @@ body {
   }
 
   @keyframes flicker {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    25% { opacity: 0.9; transform: scale(1.05); }
-    50% { opacity: 0.8; transform: scale(0.98); }
-    75% { opacity: 0.95; transform: scale(1.02); }
+
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    25% {
+      opacity: 0.9;
+      transform: scale(1.05);
+    }
+
+    50% {
+      opacity: 0.8;
+      transform: scale(0.98);
+    }
+
+    75% {
+      opacity: 0.95;
+      transform: scale(1.02);
+    }
   }
 
   /* Animation keyframes */
@@ -117,6 +165,7 @@ body {
       opacity: 0;
       transform: translateY(10px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -128,6 +177,7 @@ body {
       opacity: 0;
       transform: translateY(20px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -135,9 +185,12 @@ body {
   }
 
   @keyframes float {
-    0%, 100% {
+
+    0%,
+    100% {
       transform: translateY(0);
     }
+
     50% {
       transform: translateY(-8px);
     }
@@ -147,15 +200,19 @@ body {
     0% {
       background-position: -1000px 0;
     }
+
     100% {
       background-position: 1000px 0;
     }
   }
 
   @keyframes glow-pulse {
-    0%, 100% {
+
+    0%,
+    100% {
       box-shadow: 0 0 20px rgba(59, 130, 246, 0.3), 0 0 40px rgba(147, 51, 234, 0.2);
     }
+
     50% {
       box-shadow: 0 0 40px rgba(59, 130, 246, 0.5), 0 0 60px rgba(147, 51, 234, 0.3);
     }
@@ -199,17 +256,34 @@ body {
   }
 
   /* Staggered animation children */
-  .stagger-children > * {
+  .stagger-children>* {
     animation: fadeIn 0.6s ease-out;
     animation-fill-mode: both;
   }
 
-  .stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
-  .stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
-  .stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
-  .stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
-  .stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
-  .stagger-children > *:nth-child(6) { animation-delay: 0.6s; }
+  .stagger-children>*:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+
+  .stagger-children>*:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  .stagger-children>*:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+
+  .stagger-children>*:nth-child(4) {
+    animation-delay: 0.4s;
+  }
+
+  .stagger-children>*:nth-child(5) {
+    animation-delay: 0.5s;
+  }
+
+  .stagger-children>*:nth-child(6) {
+    animation-delay: 0.6s;
+  }
 
   /* Advanced scroll animations */
   @keyframes revealFromBottom {
@@ -218,6 +292,7 @@ body {
       transform: translateY(100px) scale(0.95);
       filter: blur(10px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0) scale(1);
@@ -231,6 +306,7 @@ body {
       transform: translateY(-100px) scale(0.95);
       filter: blur(10px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0) scale(1);
@@ -243,6 +319,7 @@ body {
       opacity: 0;
       transform: scale(0.8);
     }
+
     to {
       opacity: 1;
       transform: scale(1);
@@ -254,6 +331,7 @@ body {
       opacity: 0;
       transform: rotate(-10deg) scale(0.9);
     }
+
     to {
       opacity: 1;
       transform: rotate(0deg) scale(1);
@@ -264,19 +342,24 @@ body {
     0% {
       background-position: 0% 0%;
     }
+
     50% {
       background-position: 100% 100%;
     }
+
     100% {
       background-position: 0% 0%;
     }
   }
 
   @keyframes tribalPattern {
-    0%, 100% {
+
+    0%,
+    100% {
       background-position: 0% 0%;
       opacity: 0.3;
     }
+
     50% {
       background-position: 100% 100%;
       opacity: 0.5;
@@ -284,18 +367,23 @@ body {
   }
 
   @keyframes torchFlicker {
-    0%, 100% {
+
+    0%,
+    100% {
       filter: drop-shadow(0 0 8px rgba(255, 107, 53, 0.6)) drop-shadow(0 0 16px rgba(255, 200, 87, 0.4));
       transform: scale(1);
     }
+
     25% {
       filter: drop-shadow(0 0 12px rgba(255, 107, 53, 0.8)) drop-shadow(0 0 24px rgba(255, 200, 87, 0.6));
       transform: scale(1.02);
     }
+
     50% {
       filter: drop-shadow(0 0 6px rgba(255, 107, 53, 0.5)) drop-shadow(0 0 12px rgba(255, 200, 87, 0.3));
       transform: scale(0.98);
     }
+
     75% {
       filter: drop-shadow(0 0 10px rgba(255, 107, 53, 0.7)) drop-shadow(0 0 20px rgba(255, 200, 87, 0.5));
       transform: scale(1.01);
@@ -303,33 +391,44 @@ body {
   }
 
   @keyframes islandShift {
-    0%, 100% {
+
+    0%,
+    100% {
       transform: translateX(0) translateY(0);
     }
+
     25% {
       transform: translateX(2px) translateY(-1px);
     }
+
     50% {
       transform: translateX(-1px) translateY(1px);
     }
+
     75% {
       transform: translateX(1px) translateY(-1px);
     }
   }
 
   @keyframes textGlow {
-    0%, 100% {
+
+    0%,
+    100% {
       text-shadow: 0 0 10px rgba(255, 107, 53, 0.5), 0 0 20px rgba(255, 200, 87, 0.3);
     }
+
     50% {
       text-shadow: 0 0 20px rgba(255, 107, 53, 0.8), 0 0 40px rgba(255, 200, 87, 0.5);
     }
   }
 
   @keyframes parallaxFloat {
-    0%, 100% {
+
+    0%,
+    100% {
       transform: translateY(0px);
     }
+
     50% {
       transform: translateY(-20px);
     }
@@ -358,7 +457,7 @@ body {
   }
 
   .animate-tribal-pattern {
-    background-image: 
+    background-image:
       repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255, 107, 53, 0.03) 10px, rgba(255, 107, 53, 0.03) 20px),
       repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(255, 200, 87, 0.02) 10px, rgba(255, 200, 87, 0.02) 20px);
     background-size: 100px 100px;
@@ -436,6 +535,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {

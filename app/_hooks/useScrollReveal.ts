@@ -32,4 +32,3 @@ export function useScrollReveal(options?: { threshold?: number; rootMargin?: str
 
   return { ref, isRevealed };
 }
-

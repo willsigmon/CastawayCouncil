@@ -34,4 +34,3 @@ export function WaterRipple({ children, intensity = 1, className = "" }: WaterRi
     </motion.div>
   );
 }
-

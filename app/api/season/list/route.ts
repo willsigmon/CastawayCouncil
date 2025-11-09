@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { db } from "@/server/db/client";
-import { seasons } from "@/server/db/schema";
+import { db } from "@/app/_server/db/client";
+import { seasons } from "@/app/_server/db/schema";
 import { desc } from "drizzle-orm";
-import { handleApiError } from "@/server/errors";
+import { ApiError } from "@/app/_server/errors";
 
 export async function GET() {
   try {
@@ -18,6 +18,7 @@ export async function GET() {
       })),
     });
   } catch (error) {
-    return handleApiError(error);
+    console.error("Failed to fetch seasons:", error);
+    return NextResponse.json({ error: "Failed to fetch seasons", seasons: [] }, { status: 500 });
   }
 }

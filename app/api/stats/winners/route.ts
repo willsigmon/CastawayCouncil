@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getRecentWinners } from "@/server/analytics/queries";
+import { getRecentWinners } from "@/app/_server/analytics/queries";
 
 // Cache for 5 minutes (winners change infrequently)
 export const revalidate = 300;
