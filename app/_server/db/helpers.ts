@@ -382,10 +382,11 @@ export async function triggerCampaignEvent(eventId: string, triggeredBy: string 
   // Emit push notification for campaign event
   // Only import if available (infra directory may not be present in Vercel builds)
   try {
-    // Use Function constructor to create a dynamic import that webpack can't statically analyze
-    const importPath = '../../infra/temporal/activities';
-    const importFunc = new Function('path', 'return import(path)');
-    const activities = await importFunc(importPath);
+    // Use eval to create a fully dynamic import that webpack can't statically analyze
+    // eslint-disable-next-line @typescript-eslint/no-implied-eval
+    const importPath = ['..', '..', 'infra', 'temporal', 'activities'].join('/');
+    // eslint-disable-next-line @typescript-eslint/no-implied-eval
+    const activities = await eval(`import('${importPath}')`);
     if (activities?.emitPush) {
       await activities.emitPush({
         seasonId: event.seasonId,
@@ -497,10 +498,11 @@ export async function contributeToProject(
     // Emit push notification for project completion
     // Only import if available (infra directory may not be present in Vercel builds)
     try {
-      // Use Function constructor to create a dynamic import that webpack can't statically analyze
-      const importPath = '../../infra/temporal/activities';
-      const importFunc = new Function('path', 'return import(path)');
-      const activities = await importFunc(importPath);
+      // Use eval to create a fully dynamic import that webpack can't statically analyze
+      // eslint-disable-next-line @typescript-eslint/no-implied-eval
+      const importPath = ['..', '..', 'infra', 'temporal', 'activities'].join('/');
+      // eslint-disable-next-line @typescript-eslint/no-implied-eval
+      const activities = await eval(`import('${importPath}')`);
       if (activities?.emitPush) {
         await activities.emitPush({
           seasonId: project.seasonId,
@@ -703,10 +705,11 @@ export async function revealContent(revealId: string, revealContentJson: Record<
   // Emit push notification for reveal
   // Only import if available (infra directory may not be present in Vercel builds)
   try {
-    // Use Function constructor to create a dynamic import that webpack can't statically analyze
-    const importPath = '../../infra/temporal/activities';
-    const importFunc = new Function('path', 'return import(path)');
-    const activities = await importFunc(importPath);
+    // Use eval to create a fully dynamic import that webpack can't statically analyze
+    // eslint-disable-next-line @typescript-eslint/no-implied-eval
+    const importPath = ['..', '..', 'infra', 'temporal', 'activities'].join('/');
+    // eslint-disable-next-line @typescript-eslint/no-implied-eval
+    const activities = await eval(`import('${importPath}')`);
     if (activities?.emitPush) {
       await activities.emitPush({
         seasonId: reveal.seasonId,
