@@ -4,7 +4,7 @@ import {
     getTotalSeasonsCount,
     getTotalVotesCount,
     getMessagesCountToday,
-} from "@/app/_server/analytics/queries";
+} from "@/server/analytics/queries";
 
 // Cache for 60 seconds with stale-while-revalidate
 export const revalidate = 60;
