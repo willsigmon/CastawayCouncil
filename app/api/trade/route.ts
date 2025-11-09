@@ -14,7 +14,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Cannot create trade for another player" }, { status: 403 });
     }
 
-    const trade = await createTradeOffer(data);
+    const trade = await createTradeOffer({
+      ...data,
+      resourcesOfferedJson: data.resourcesOfferedJson as Record<string, number>,
+      resourcesRequestedJson: data.resourcesRequestedJson as Record<string, number>,
+    });
     return NextResponse.json({ ok: true, trade });
   } catch (error) {
     return handleApiError(error);
