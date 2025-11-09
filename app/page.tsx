@@ -6,6 +6,10 @@ import { AnimatedCounter } from "./_components/AnimatedCounter";
 import { FAQAccordion } from "./_components/FAQAccordion";
 import { useSeason } from "./_components/SeasonContext";
 import { createClient } from "./_lib/supabase/client";
+import { ScrollReveal, ParallaxSection, StaggerChildren } from "./_components/ScrollReveal";
+import { TextReveal } from "./_components/TextReveal";
+import { TorchFlicker } from "./_components/TorchFlicker";
+import { WaterRipple } from "./_components/WaterRipple";
 
 interface Season {
   id: string;
@@ -186,23 +190,34 @@ export default function Home() {
       <main className="min-h-screen relative">
         <div className="max-w-6xl mx-auto px-4 py-12 relative z-10">
           {/* Hero */}
-          <div className="mb-24 relative">
+          <WaterRipple className="mb-24 relative">
             <div className="text-center">
-              <div className="inline-block mb-4 animate-fade-in">
-                <div className="text-xs uppercase tracking-widest text-amber-500/90 font-tribal font-bold animate-pulse">
-                  Outwit • Outplay • Outlast
+              <ScrollReveal delay={0}>
+                <div className="inline-block mb-4">
+                  <div className="text-xs uppercase tracking-widest text-amber-500/90 font-tribal font-bold animate-pulse animate-torch-flicker">
+                    Outwit • Outplay • Outlast
+                  </div>
                 </div>
-              </div>
-              <h1 className="text-5xl sm:text-7xl font-adventure mb-6 torch-glow drop-shadow-[0_0_30px_rgba(255,107,53,0.5)] animate-fade-in-up">
-                CASTAWAY COUNCIL
-              </h1>
-              <p className="text-xl sm:text-2xl text-amber-200 max-w-3xl mx-auto mb-3 font-tribal font-bold leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-                A real-time social survival RPG where 18 players compete over 15 days
-              </p>
-              <p className="text-base sm:text-lg text-amber-300/80 max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                Outwit your rivals through strategy. Outlast the competition through skill. Outplay everyone to become the sole survivor.
-              </p>
-              <div className="flex flex-wrap gap-4 justify-center animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+              </ScrollReveal>
+              <ScrollReveal delay={0.1} direction="fade">
+                <TorchFlicker intensity={1.5}>
+                  <h1 className="text-5xl sm:text-7xl font-adventure mb-6 torch-glow drop-shadow-[0_0_30px_rgba(255,107,53,0.5)] animate-text-glow">
+                    <TextReveal splitBy="word">CASTAWAY COUNCIL</TextReveal>
+                  </h1>
+                </TorchFlicker>
+              </ScrollReveal>
+              <ScrollReveal delay={0.2} direction="up">
+                <p className="text-xl sm:text-2xl text-amber-200 max-w-3xl mx-auto mb-3 font-tribal font-bold leading-relaxed">
+                  <TextReveal splitBy="word">A real-time social survival RPG where 18 players compete over 15 days</TextReveal>
+                </p>
+              </ScrollReveal>
+              <ScrollReveal delay={0.3} direction="up">
+                <p className="text-base sm:text-lg text-amber-300/80 max-w-2xl mx-auto mb-10 leading-relaxed">
+                  <TextReveal splitBy="word">Outwit your rivals through strategy. Outlast the competition through skill. Outplay everyone to become the sole survivor.</TextReveal>
+                </p>
+              </ScrollReveal>
+              <ScrollReveal delay={0.4} direction="up">
+                <div className="flex flex-wrap gap-4 justify-center">
                 <Link
                   href="/apply"
                   className="group px-10 py-4 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 active:from-orange-700 active:to-amber-700 rounded-lg font-bold text-lg transition-all duration-300 shadow-lg shadow-orange-900/40 hover:shadow-2xl hover:shadow-orange-900/60 focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-950 focus-visible:outline-none border border-amber-700/30 hover:scale-105 hover:-translate-y-0.5"
@@ -218,27 +233,35 @@ export default function Home() {
                   <span className="inline-block ml-2 transition-transform group-hover:translate-x-1">→</span>
                 </Link>
               </div>
+              </ScrollReveal>
             </div>
-          </div>
+          </WaterRipple>
 
           {/* Game Overview */}
-          <div className="mb-24 border-t border-amber-900/30 pt-20">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-adventure text-amber-200 uppercase mb-4 torch-glow">The Game</h2>
-              <p className="text-lg text-amber-300/80 max-w-3xl mx-auto font-bold mb-6">
-                15 days. 18 players. 3 phases per day. Only 1 survivor.
-              </p>
-              <p className="text-base text-amber-300/70 max-w-4xl mx-auto leading-relaxed">
-                Castaway Council combines the strategic depth of Survivor with the persistent world-building of D&D campaigns.
-                Every action you take builds your narrative arc. Every alliance you form shapes the social landscape.
-                Every resource you gather can be traded, crafted, or hoarded. This isn&apos;t just a game—it&apos;s a living, breathing social experiment.
-              </p>
-            </div>
+          <ParallaxSection speed={0.3}>
+            <div className="mb-24 border-t border-amber-900/30 pt-20 animate-tribal-pattern">
+              <ScrollReveal direction="up">
+                <div className="text-center mb-16">
+                  <h2 className="text-4xl font-adventure text-amber-200 uppercase mb-4 torch-glow hover-torch">
+                    <TextReveal splitBy="word">The Game</TextReveal>
+                  </h2>
+                  <p className="text-lg text-amber-300/80 max-w-3xl mx-auto font-bold mb-6">
+                    <TextReveal splitBy="word">15 days. 18 players. 3 phases per day. Only 1 survivor.</TextReveal>
+                  </p>
+                  <p className="text-base text-amber-300/70 max-w-4xl mx-auto leading-relaxed">
+                    <TextReveal splitBy="word">
+                      Castaway Council combines the strategic depth of Survivor with the persistent world-building of D&D campaigns.
+                      Every action you take builds your narrative arc. Every alliance you form shapes the social landscape.
+                      Every resource you gather can be traded, crafted, or hoarded. This isn&apos;t just a game—it&apos;s a living, breathing social experiment.
+                    </TextReveal>
+                  </p>
+                </div>
+              </ScrollReveal>
 
-            <div className="grid md:grid-cols-3 gap-10 mb-16">
-              <div className="text-center group cursor-default">
-                <div className="text-7xl mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">🏕️</div>
-                <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-4 transition-colors group-hover:text-orange-400">Camp Phase</h3>
+              <StaggerChildren delay={0.15}>
+                    <div className="text-center group cursor-default perspective-container">
+                  <div className="perspective-item text-7xl mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 hover-lift">🏕️</div>
+                  <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-4 transition-colors group-hover:text-orange-400 hover-torch">Camp Phase</h3>
                 <p className="text-amber-200/80 leading-relaxed transition-colors group-hover:text-amber-200 mb-4">
                   Forage for food, search for hidden immunity idols, build camp improvements, and plot with your alliance. Every action matters.
                 </p>
@@ -251,9 +274,9 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="text-center group cursor-default">
-                <div className="text-7xl mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">⚔️</div>
-                <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-4 transition-colors group-hover:text-orange-400">Challenge Phase</h3>
+                <div className="text-center group cursor-default perspective-container">
+                  <div className="perspective-item text-7xl mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 hover-lift">⚔️</div>
+                  <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-4 transition-colors group-hover:text-orange-400 hover-torch">Challenge Phase</h3>
                 <p className="text-amber-200/80 leading-relaxed transition-colors group-hover:text-amber-200 mb-4">
                   Compete in immunity challenges. Winners are safe from elimination. Losers face tribal council. Your archetype abilities activate here.
                 </p>
@@ -266,9 +289,9 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="text-center group cursor-default">
-                <div className="text-7xl mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">🔥</div>
-                <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-4 transition-colors group-hover:text-orange-400">Tribal Council</h3>
+                <div className="text-center group cursor-default perspective-container">
+                  <div className="perspective-item text-7xl mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 hover-lift">🔥</div>
+                  <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-4 transition-colors group-hover:text-orange-400 hover-torch">Tribal Council</h3>
                 <p className="text-amber-200/80 leading-relaxed transition-colors group-hover:text-amber-200 mb-4">
                   Vote to eliminate one player. Use idols to save yourself. Survive the vote or your torch gets snuffed. The tribe has spoken.
                 </p>
@@ -279,10 +302,11 @@ export default function Home() {
                   <p>• Jury begins after merge</p>
                   <p>• Every vote counts</p>
                 </div>
-              </div>
-            </div>
+                </div>
+              </StaggerChildren>
 
-            <div className="wood-panel rounded-lg p-10 max-w-4xl mx-auto border-2 border-amber-700/30 hover:border-amber-600/50 transition-all duration-500 hover:shadow-2xl hover:shadow-amber-900/40">
+              <ScrollReveal direction="up" delay={0.2}>
+                <div className="wood-panel rounded-lg p-10 max-w-4xl mx-auto border-2 border-amber-700/30 hover:border-amber-600/50 transition-all duration-500 hover:shadow-2xl hover:shadow-amber-900/40 hover-lift hover-glow">
               <div className="text-center">
                 <div className="text-6xl mb-6 animate-pulse">👑</div>
                 <h3 className="text-3xl font-tribal text-amber-100 font-bold mb-6 torch-glow">Path to Victory</h3>
@@ -293,13 +317,19 @@ export default function Home() {
                   <p className="hover:text-amber-100 transition-colors pl-4 border-l-2 border-amber-700/50 hover:border-orange-500 hover:pl-6 transition-all duration-300">• <span className="font-bold text-amber-100">The Jury:</span> All eliminated players after merge vote for the winner. Outwit. Outplay. Outlast.</p>
                 </div>
               </div>
+                </div>
+              </ScrollReveal>
             </div>
-          </div>
+          </ParallaxSection>
 
           {/* Character Classes Detail */}
-          <div className="mb-24 border-t border-amber-900/30 pt-20">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-adventure text-amber-200 uppercase mb-4 torch-glow">Choose Your Archetype</h2>
+          <ParallaxSection speed={0.2}>
+            <div className="mb-24 border-t border-amber-900/30 pt-20">
+              <ScrollReveal direction="up">
+                <div className="text-center mb-16">
+                  <h2 className="text-4xl font-adventure text-amber-200 uppercase mb-4 torch-glow hover-torch">
+                    <TextReveal splitBy="word">Choose Your Archetype</TextReveal>
+                  </h2>
               <p className="text-lg text-amber-300/80 max-w-3xl mx-auto">
                 Each class has unique abilities that change how you play. Choose wisely—your archetype defines your survival strategy.
               </p>

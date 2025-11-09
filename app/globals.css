@@ -22,6 +22,10 @@
   margin: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html,
 body {
   max-width: 100vw;
@@ -206,6 +210,229 @@ body {
   .stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
   .stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
   .stagger-children > *:nth-child(6) { animation-delay: 0.6s; }
+
+  /* Advanced scroll animations */
+  @keyframes revealFromBottom {
+    from {
+      opacity: 0;
+      transform: translateY(100px) scale(0.95);
+      filter: blur(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+  }
+
+  @keyframes revealFromTop {
+    from {
+      opacity: 0;
+      transform: translateY(-100px) scale(0.95);
+      filter: blur(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes rotateIn {
+    from {
+      opacity: 0;
+      transform: rotate(-10deg) scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: rotate(0deg) scale(1);
+    }
+  }
+
+  @keyframes waterRipple {
+    0% {
+      background-position: 0% 0%;
+    }
+    50% {
+      background-position: 100% 100%;
+    }
+    100% {
+      background-position: 0% 0%;
+    }
+  }
+
+  @keyframes tribalPattern {
+    0%, 100% {
+      background-position: 0% 0%;
+      opacity: 0.3;
+    }
+    50% {
+      background-position: 100% 100%;
+      opacity: 0.5;
+    }
+  }
+
+  @keyframes torchFlicker {
+    0%, 100% {
+      filter: drop-shadow(0 0 8px rgba(255, 107, 53, 0.6)) drop-shadow(0 0 16px rgba(255, 200, 87, 0.4));
+      transform: scale(1);
+    }
+    25% {
+      filter: drop-shadow(0 0 12px rgba(255, 107, 53, 0.8)) drop-shadow(0 0 24px rgba(255, 200, 87, 0.6));
+      transform: scale(1.02);
+    }
+    50% {
+      filter: drop-shadow(0 0 6px rgba(255, 107, 53, 0.5)) drop-shadow(0 0 12px rgba(255, 200, 87, 0.3));
+      transform: scale(0.98);
+    }
+    75% {
+      filter: drop-shadow(0 0 10px rgba(255, 107, 53, 0.7)) drop-shadow(0 0 20px rgba(255, 200, 87, 0.5));
+      transform: scale(1.01);
+    }
+  }
+
+  @keyframes islandShift {
+    0%, 100% {
+      transform: translateX(0) translateY(0);
+    }
+    25% {
+      transform: translateX(2px) translateY(-1px);
+    }
+    50% {
+      transform: translateX(-1px) translateY(1px);
+    }
+    75% {
+      transform: translateX(1px) translateY(-1px);
+    }
+  }
+
+  @keyframes textGlow {
+    0%, 100% {
+      text-shadow: 0 0 10px rgba(255, 107, 53, 0.5), 0 0 20px rgba(255, 200, 87, 0.3);
+    }
+    50% {
+      text-shadow: 0 0 20px rgba(255, 107, 53, 0.8), 0 0 40px rgba(255, 200, 87, 0.5);
+    }
+  }
+
+  @keyframes parallaxFloat {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  /* Advanced animation classes */
+  .animate-reveal-bottom {
+    animation: revealFromBottom 1s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  }
+
+  .animate-reveal-top {
+    animation: revealFromTop 1s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  }
+
+  .animate-rotate-in {
+    animation: rotateIn 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  }
+
+  .animate-water-ripple {
+    background-size: 200% 200%;
+    animation: waterRipple 20s ease-in-out infinite;
+  }
+
+  .animate-tribal-pattern {
+    background-image: 
+      repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255, 107, 53, 0.03) 10px, rgba(255, 107, 53, 0.03) 20px),
+      repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(255, 200, 87, 0.02) 10px, rgba(255, 200, 87, 0.02) 20px);
+    background-size: 100px 100px;
+    animation: tribalPattern 15s ease-in-out infinite;
+  }
+
+  .animate-torch-flicker {
+    animation: torchFlicker 2s ease-in-out infinite;
+  }
+
+  .animate-island-shift {
+    animation: islandShift 8s ease-in-out infinite;
+  }
+
+  .animate-text-glow {
+    animation: textGlow 3s ease-in-out infinite;
+  }
+
+  .animate-parallax-float {
+    animation: parallaxFloat 6s ease-in-out infinite;
+  }
+
+  /* Smooth hover effects */
+  .hover-lift {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-8px) scale(1.02);
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
+  }
+
+  .hover-glow {
+    @apply transition-all duration-300;
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 30px rgba(255, 107, 53, 0.4), 0 0 60px rgba(255, 200, 87, 0.2);
+  }
+
+  .hover-torch {
+    @apply transition-all duration-300;
+  }
+
+  .hover-torch:hover {
+    filter: drop-shadow(0 0 15px rgba(255, 107, 53, 0.8)) drop-shadow(0 0 30px rgba(255, 200, 87, 0.5));
+    transform: scale(1.05);
+  }
+
+  /* Scroll-triggered reveal */
+  .scroll-reveal {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.8s cubic-bezier(0.25, 0.1, 0.25, 1), transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
+  .scroll-reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Perspective effects */
+  .perspective-container {
+    perspective: 1000px;
+  }
+
+  .perspective-item {
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
+  .perspective-item:hover {
+    transform: rotateY(5deg) rotateX(-5deg) translateZ(20px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
