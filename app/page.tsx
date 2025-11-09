@@ -84,20 +84,20 @@ export default function Home() {
 
         const applicationPromise: Promise<PlayerApplicationSummary | null> = authResult
           ? fetch("/api/applications")
-              .then((r) => (r.ok ? r.json() : { application: null }))
-              .then((data) =>
-                data.application
-                  ? {
-                      status: data.application.status as PlayerApplicationSummary["status"],
-                      wordScore: data.application.wordScore as number,
-                      updatedAt: data.application.updatedAt as string,
-                    }
-                  : null
-              )
-              .catch((error) => {
-                console.error("Failed to load application:", error);
-                return null;
-              })
+            .then((r) => (r.ok ? r.json() : { application: null }))
+            .then((data) =>
+              data.application
+                ? {
+                  status: data.application.status as PlayerApplicationSummary["status"],
+                  wordScore: data.application.wordScore as number,
+                  updatedAt: data.application.updatedAt as string,
+                }
+                : null
+            )
+            .catch((error) => {
+              console.error("Failed to load application:", error);
+              return null;
+            })
           : Promise.resolve(null);
 
         const [seasonsResult, statsResult, winnersResult, applicationResult] = await Promise.all([
@@ -196,13 +196,13 @@ export default function Home() {
               <h1 className="text-5xl sm:text-7xl font-adventure mb-6 torch-glow drop-shadow-[0_0_30px_rgba(255,107,53,0.5)] animate-fade-in-up">
                 CASTAWAY COUNCIL
               </h1>
-              <p className="text-xl sm:text-2xl text-amber-200 max-w-3xl mx-auto mb-3 font-tribal font-bold leading-relaxed animate-fade-in-up" style={{animationDelay: '0.1s'}}>
+              <p className="text-xl sm:text-2xl text-amber-200 max-w-3xl mx-auto mb-3 font-tribal font-bold leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
                 A real-time social survival RPG where 18 players compete over 15 days
               </p>
-              <p className="text-base sm:text-lg text-amber-300/80 max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-in-up" style={{animationDelay: '0.2s'}}>
+              <p className="text-base sm:text-lg text-amber-300/80 max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
                 Outwit your rivals through strategy. Outlast the competition through skill. Outplay everyone to become the sole survivor.
               </p>
-              <div className="flex flex-wrap gap-4 justify-center animate-fade-in-up" style={{animationDelay: '0.3s'}}>
+              <div className="flex flex-wrap gap-4 justify-center animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
                 <Link
                   href="/apply"
                   className="group px-10 py-4 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 active:from-orange-700 active:to-amber-700 rounded-lg font-bold text-lg transition-all duration-300 shadow-lg shadow-orange-900/40 hover:shadow-2xl hover:shadow-orange-900/60 focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-950 focus-visible:outline-none border border-amber-700/30 hover:scale-105 hover:-translate-y-0.5"
@@ -229,8 +229,8 @@ export default function Home() {
                 15 days. 18 players. 3 phases per day. Only 1 survivor.
               </p>
               <p className="text-base text-amber-300/70 max-w-4xl mx-auto leading-relaxed">
-                Castaway Council combines the strategic depth of Survivor with the persistent world-building of D&D campaigns. 
-                Every action you take builds your narrative arc. Every alliance you form shapes the social landscape. 
+                Castaway Council combines the strategic depth of Survivor with the persistent world-building of D&D campaigns.
+                Every action you take builds your narrative arc. Every alliance you form shapes the social landscape.
                 Every resource you gather can be traded, crafted, or hoarded. This isn&apos;t just a game—it&apos;s a living, breathing social experiment.
               </p>
             </div>
@@ -625,7 +625,7 @@ export default function Home() {
                   <div>
                     <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-3">Apply & Get Cast</h3>
                     <p className="text-amber-200/80 leading-relaxed mb-3">
-                      Answer five detailed prompts about your strategy, personality, and goals. Multi-sentence answers land on the shortlist. 
+                      Answer five detailed prompts about your strategy, personality, and goals. Multi-sentence answers land on the shortlist.
                       One-word responses are automatically skipped. We&apos;re looking for players who think strategically and communicate clearly.
                     </p>
                     <p className="text-sm text-amber-300/60">
@@ -641,8 +641,8 @@ export default function Home() {
                   <div>
                     <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-3">Join Your Tribe</h3>
                     <p className="text-amber-200/80 leading-relaxed mb-3">
-                      On Day 1, you&apos;re assigned to one of three tribes. Each tribe starts with 6 players. 
-                      This is your family for the first phase of the game. Build relationships, contribute to camp, 
+                      On Day 1, you&apos;re assigned to one of three tribes. Each tribe starts with 6 players.
+                      This is your family for the first phase of the game. Build relationships, contribute to camp,
                       and form alliances—but remember, only one person can win.
                     </p>
                     <p className="text-sm text-amber-300/60">
@@ -658,8 +658,8 @@ export default function Home() {
                   <div>
                     <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-3">Survive Daily Phases</h3>
                     <p className="text-amber-200/80 leading-relaxed mb-3">
-                      Each day has three phases: Camp (6-8 hours), Challenge (6-8 hours), and Tribal Council (6-8 hours). 
-                      During Camp, forage, craft, trade, and strategize. During Challenge, compete for immunity. 
+                      Each day has three phases: Camp (6-8 hours), Challenge (6-8 hours), and Tribal Council (6-8 hours).
+                      During Camp, forage, craft, trade, and strategize. During Challenge, compete for immunity.
                       At Tribal Council, vote someone out. One player eliminated per day until the merge.
                     </p>
                     <p className="text-sm text-amber-300/60">
@@ -675,8 +675,8 @@ export default function Home() {
                   <div>
                     <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-3">Merge & Face the Jury</h3>
                     <p className="text-amber-200/80 leading-relaxed mb-3">
-                      When 11 players remain, tribes merge into one. The jury begins—every eliminated player after the merge 
-                      votes for the winner at Final Tribal Council. Build relationships, make big moves, and manage your reputation. 
+                      When 11 players remain, tribes merge into one. The jury begins—every eliminated player after the merge
+                      votes for the winner at Final Tribal Council. Build relationships, make big moves, and manage your reputation.
                       The jury remembers everything.
                     </p>
                     <p className="text-sm text-amber-300/60">
@@ -692,8 +692,8 @@ export default function Home() {
                   <div>
                     <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-3">Win Final Tribal Council</h3>
                     <p className="text-amber-200/80 leading-relaxed mb-3">
-                      Final 4 compete in the last challenge. Winner picks 2 rivals for a 1v1 battle. Final 3 face the jury. 
-                      Make your case. Explain your strategy. Convince the jury you deserve the title of Sole Survivor. 
+                      Final 4 compete in the last challenge. Winner picks 2 rivals for a 1v1 battle. Final 3 face the jury.
+                      Make your case. Explain your strategy. Convince the jury you deserve the title of Sole Survivor.
                       The jury votes. One winner emerges.
                     </p>
                     <p className="text-sm text-amber-300/60">
@@ -799,11 +799,11 @@ export default function Home() {
         </div>
 
         {currentSeason && currentPlayer && (
-        <div className="mb-8 p-8 glass rounded-2xl border border-blue-500/30 card-hover">
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h2 className="text-2xl font-bold mb-2">Welcome back, {currentPlayer.displayName}!</h2>
-              <p className="text-white/90">You&apos;re currently playing in <span className="font-semibold text-blue-400">{currentSeason.name}</span></p>
+          <div className="mb-8 p-8 glass rounded-2xl border border-blue-500/30 card-hover">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h2 className="text-2xl font-bold mb-2">Welcome back, {currentPlayer.displayName}!</h2>
+                <p className="text-white/90">You&apos;re currently playing in <span className="font-semibold text-blue-400">{currentSeason.name}</span></p>
               </div>
               <span className="px-3 py-1 text-xs font-semibold bg-gradient-to-r from-green-500 to-emerald-500 rounded-full text-black">
                 Active
@@ -828,9 +828,9 @@ export default function Home() {
               >
                 Tribal Council
               </Link>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
         {user && !loading && (
           <div className="mb-8 p-8 glass rounded-2xl border border-amber-500/30 card-hover">
@@ -844,11 +844,10 @@ export default function Home() {
                     </p>
                   </div>
                   <span
-                    className={`px-4 py-1 rounded-full text-sm font-semibold ${
-                      applicationSummary.status === "shortlist"
+                    className={`px-4 py-1 rounded-full text-sm font-semibold ${applicationSummary.status === "shortlist"
                         ? "bg-emerald-500/10 text-emerald-300 border border-emerald-400/40"
                         : "bg-amber-500/10 text-amber-200 border border-amber-400/40"
-                    }`}
+                      }`}
                   >
                     {applicationSummary.status === "shortlist" ? "Shortlist Ready" : "Needs More Detail"}
                   </span>
