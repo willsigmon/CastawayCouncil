@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
       scheduledDay: data.scheduledDay,
       scheduledPhase: data.scheduledPhase,
       payloadJson: data.payloadJson,
-      statEffectsJson: data.statEffectsJson,
+      statEffectsJson: data.statEffectsJson as Record<string, Record<string, number>> | undefined,
       triggeredBy: data.scheduledDay ? undefined : gmPlayer.id, // Auto-trigger if not scheduled
     });
 
