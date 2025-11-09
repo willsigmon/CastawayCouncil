@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     }
 
     const result = await contributeToProject(data.projectId, player.id, season.dayIndex, {
-      resourcesContributedJson: data.resourcesContributedJson,
+      resourcesContributedJson: data.resourcesContributedJson as Record<string, number> | undefined,
       progressAdded: data.progressAdded,
     });
 
