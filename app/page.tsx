@@ -225,8 +225,13 @@ export default function Home() {
           <div className="mb-24 border-t border-amber-900/30 pt-20">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-adventure text-amber-200 uppercase mb-4 torch-glow">The Game</h2>
-              <p className="text-lg text-amber-300/80 max-w-3xl mx-auto font-bold">
+              <p className="text-lg text-amber-300/80 max-w-3xl mx-auto font-bold mb-6">
                 15 days. 18 players. 3 phases per day. Only 1 survivor.
+              </p>
+              <p className="text-base text-amber-300/70 max-w-4xl mx-auto leading-relaxed">
+                Castaway Council combines the strategic depth of Survivor with the persistent world-building of D&D campaigns. 
+                Every action you take builds your narrative arc. Every alliance you form shapes the social landscape. 
+                Every resource you gather can be traded, crafted, or hoarded. This isn&apos;t just a game—it&apos;s a living, breathing social experiment.
               </p>
             </div>
 
@@ -234,25 +239,46 @@ export default function Home() {
               <div className="text-center group cursor-default">
                 <div className="text-7xl mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">🏕️</div>
                 <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-4 transition-colors group-hover:text-orange-400">Camp Phase</h3>
-                <p className="text-amber-200/80 leading-relaxed transition-colors group-hover:text-amber-200">
+                <p className="text-amber-200/80 leading-relaxed transition-colors group-hover:text-amber-200 mb-4">
                   Forage for food, search for hidden immunity idols, build camp improvements, and plot with your alliance. Every action matters.
                 </p>
+                <div className="text-sm text-amber-300/60 space-y-2">
+                  <p>• Craft tools from gathered resources</p>
+                  <p>• Contribute to tribe projects</p>
+                  <p>• Trade resources with allies</p>
+                  <p>• Form secret alliances via DM</p>
+                  <p>• Build your narrative arc</p>
+                </div>
               </div>
 
               <div className="text-center group cursor-default">
                 <div className="text-7xl mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">⚔️</div>
                 <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-4 transition-colors group-hover:text-orange-400">Challenge Phase</h3>
-                <p className="text-amber-200/80 leading-relaxed transition-colors group-hover:text-amber-200">
+                <p className="text-amber-200/80 leading-relaxed transition-colors group-hover:text-amber-200 mb-4">
                   Compete in immunity challenges. Winners are safe from elimination. Losers face tribal council. Your archetype abilities activate here.
                 </p>
+                <div className="text-sm text-amber-300/60 space-y-2">
+                  <p>• Provably fair commit-reveal RNG</p>
+                  <p>• Team and individual challenges</p>
+                  <p>• Archetype bonuses apply</p>
+                  <p>• Energy and stats affect outcomes</p>
+                  <p>• Winners gain immunity</p>
+                </div>
               </div>
 
               <div className="text-center group cursor-default">
                 <div className="text-7xl mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">🔥</div>
                 <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-4 transition-colors group-hover:text-orange-400">Tribal Council</h3>
-                <p className="text-amber-200/80 leading-relaxed transition-colors group-hover:text-amber-200">
+                <p className="text-amber-200/80 leading-relaxed transition-colors group-hover:text-amber-200 mb-4">
                   Vote to eliminate one player. Use idols to save yourself. Survive the vote or your torch gets snuffed. The tribe has spoken.
                 </p>
+                <div className="text-sm text-amber-300/60 space-y-2">
+                  <p>• Secret ballot voting</p>
+                  <p>• Play hidden immunity idols</p>
+                  <p>• Tie-breaker rules apply</p>
+                  <p>• Jury begins after merge</p>
+                  <p>• Every vote counts</p>
+                </div>
               </div>
             </div>
 
@@ -471,6 +497,67 @@ export default function Home() {
             </div>
           )}
 
+          {/* Advanced Features */}
+          <div className="mb-24 border-t border-amber-900/30 pt-20">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-adventure text-amber-200 uppercase mb-4 torch-glow">Deep Systems</h2>
+              <p className="text-lg text-amber-300/80 max-w-3xl mx-auto">
+                Castaway Council isn&apos;t just voting and challenges. It&apos;s a complete survival ecosystem with crafting, trading, projects, and narrative progression.
+              </p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+              <div className="wood-panel rounded-lg p-6 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500 hover:shadow-xl hover:shadow-amber-900/40 hover:scale-105 group cursor-pointer">
+                <div className="text-5xl mb-4 transition-transform duration-300 group-hover:scale-110">🔨</div>
+                <h3 className="text-lg font-tribal text-amber-100 font-bold mb-2 group-hover:text-orange-400 transition-colors">Crafting System</h3>
+                <p className="text-sm text-amber-200/70 leading-relaxed">
+                  Discover recipes as you explore. Craft tools, weapons, and survival gear from gathered resources. Each item gives strategic advantages.
+                </p>
+              </div>
+
+              <div className="wood-panel rounded-lg p-6 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500 hover:shadow-xl hover:shadow-amber-900/40 hover:scale-105 group cursor-pointer">
+                <div className="text-5xl mb-4 transition-transform duration-300 group-hover:scale-110">🤝</div>
+                <h3 className="text-lg font-tribal text-amber-100 font-bold mb-2 group-hover:text-orange-400 transition-colors">Trade Economy</h3>
+                <p className="text-sm text-amber-200/70 leading-relaxed">
+                  Negotiate resource trades with players and tribes. Build trust through fair deals. Hoard resources or share strategically.
+                </p>
+              </div>
+
+              <div className="wood-panel rounded-lg p-6 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500 hover:shadow-xl hover:shadow-amber-900/40 hover:scale-105 group cursor-pointer">
+                <div className="text-5xl mb-4 transition-transform duration-300 group-hover:scale-110">🏗️</div>
+                <h3 className="text-lg font-tribal text-amber-100 font-bold mb-2 group-hover:text-orange-400 transition-colors">Tribe Projects</h3>
+                <p className="text-sm text-amber-200/70 leading-relaxed">
+                  Work together to build camp improvements. Contribute resources and progress. Completed projects unlock powerful bonuses for your tribe.
+                </p>
+              </div>
+
+              <div className="wood-panel rounded-lg p-6 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500 hover:shadow-xl hover:shadow-amber-900/40 hover:scale-105 group cursor-pointer">
+                <div className="text-5xl mb-4 transition-transform duration-300 group-hover:scale-110">📖</div>
+                <h3 className="text-lg font-tribal text-amber-100 font-bold mb-2 group-hover:text-orange-400 transition-colors">Narrative Arcs</h3>
+                <p className="text-sm text-amber-200/70 leading-relaxed">
+                  Your actions build your character&apos;s story. Track your arc progression through milestones. Become the hero, villain, or wildcard.
+                </p>
+              </div>
+            </div>
+
+            <div className="wood-panel rounded-lg p-10 max-w-4xl mx-auto border-2 border-amber-700/40 hover:border-orange-500 transition-all duration-500">
+              <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-6 text-center">Resource Management</h3>
+              <div className="grid md:grid-cols-3 gap-6 text-sm">
+                <div>
+                  <h4 className="text-orange-400 font-bold mb-2 uppercase">Food & Water</h4>
+                  <p className="text-amber-200/70">Forage, fish, or trade for sustenance. Low hunger/thirst reduces your effectiveness in challenges.</p>
+                </div>
+                <div>
+                  <h4 className="text-orange-400 font-bold mb-2 uppercase">Materials</h4>
+                  <p className="text-amber-200/70">Wood, stone, and fibers for crafting and building. Essential for camp improvements and tools.</p>
+                </div>
+                <div>
+                  <h4 className="text-orange-400 font-bold mb-2 uppercase">Energy</h4>
+                  <p className="text-amber-200/70">Rest to recover. High energy improves challenge performance. Manage it wisely—every action costs energy.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Why Play */}
           <div className="mb-24 border-t border-amber-900/30 pt-20">
             <div className="text-center mb-16">
@@ -480,27 +567,141 @@ export default function Home() {
               <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500 hover:shadow-2xl hover:shadow-amber-900/40 hover:scale-105 group cursor-pointer">
                 <div className="text-5xl mb-4 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12">🎲</div>
                 <h3 className="text-xl font-tribal text-amber-100 font-bold mb-3 group-hover:text-orange-400 transition-colors">Provably Fair</h3>
-                <p className="text-amber-200/80 leading-relaxed">
+                <p className="text-amber-200/80 leading-relaxed mb-3">
                   Every challenge uses cryptographic commit-reveal protocol. The server commits to results before you make choices. All RNG is verifiable—no hidden advantages, no cheating possible.
+                </p>
+                <p className="text-sm text-amber-300/60">
+                  You can verify every roll. Every challenge result is transparent. No &quot;trust us&quot;—just math and cryptography.
                 </p>
               </div>
 
               <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500 hover:shadow-2xl hover:shadow-amber-900/40 hover:scale-105 group cursor-pointer">
                 <div className="text-5xl mb-4 transition-transform duration-300 group-hover:scale-110">⏱️</div>
                 <h3 className="text-xl font-tribal text-amber-100 font-bold mb-3 group-hover:text-orange-400 transition-colors">Your Own Pace</h3>
-                <p className="text-amber-200/80 leading-relaxed">
+                <p className="text-amber-200/80 leading-relaxed mb-3">
                   Each phase lasts 6-8 hours. No need to be online constantly. Check in when it works for you. 15 in-game days = 4-5 real weeks. Perfect for busy schedules.
+                </p>
+                <p className="text-sm text-amber-300/60">
+                  Set your notifications. Play during lunch breaks. Vote before bed. The game adapts to your life, not the other way around.
                 </p>
               </div>
 
               <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500 hover:shadow-2xl hover:shadow-amber-900/40 hover:scale-105 group cursor-pointer">
                 <div className="text-5xl mb-4 transition-transform duration-300 group-hover:scale-110">💬</div>
                 <h3 className="text-xl font-tribal text-amber-100 font-bold mb-3 group-hover:text-orange-400 transition-colors">Real Strategy</h3>
-                <p className="text-amber-200/80 leading-relaxed">
+                <p className="text-amber-200/80 leading-relaxed mb-3">
                   Form secret alliances. Backstab rivals. Bluff about idols. Every tribal council is a social chess match. Your words matter as much as your stats.
+                </p>
+                <p className="text-sm text-amber-300/60">
+                  Direct messages, tribe chat, and public confessionals. Every conversation is a potential move in the game.
                 </p>
               </div>
 
+              <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500 hover:shadow-2xl hover:shadow-amber-900/40 hover:scale-105 group cursor-pointer">
+                <div className="text-5xl mb-4 transition-transform duration-300 group-hover:scale-110">📱</div>
+                <h3 className="text-xl font-tribal text-amber-100 font-bold mb-3 group-hover:text-orange-400 transition-colors">Progressive Web App</h3>
+                <p className="text-amber-200/80 leading-relaxed mb-3">
+                  Works perfectly on mobile, tablet, and desktop. Install to your home screen. Push notifications keep you updated. No app store required.
+                </p>
+                <p className="text-sm text-amber-300/60">
+                  Play on your phone during commutes. Check in from any device. Your progress syncs instantly across platforms.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* How It Works */}
+          <div className="mb-24 border-t border-amber-900/30 pt-20">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-adventure text-amber-200 uppercase mb-4 torch-glow">How It Works</h2>
+              <p className="text-lg text-amber-300/80 max-w-3xl mx-auto">
+                From application to finale—here&apos;s your journey to becoming the Sole Survivor
+              </p>
+            </div>
+            <div className="max-w-4xl mx-auto space-y-8">
+              <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500">
+                <div className="flex items-start gap-6">
+                  <div className="text-4xl font-tribal font-bold text-orange-500 flex-shrink-0">1</div>
+                  <div>
+                    <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-3">Apply & Get Cast</h3>
+                    <p className="text-amber-200/80 leading-relaxed mb-3">
+                      Answer five detailed prompts about your strategy, personality, and goals. Multi-sentence answers land on the shortlist. 
+                      One-word responses are automatically skipped. We&apos;re looking for players who think strategically and communicate clearly.
+                    </p>
+                    <p className="text-sm text-amber-300/60">
+                      Applications are reviewed before each season. You&apos;ll be notified via email if you&apos;re selected.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500">
+                <div className="flex items-start gap-6">
+                  <div className="text-4xl font-tribal font-bold text-orange-500 flex-shrink-0">2</div>
+                  <div>
+                    <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-3">Join Your Tribe</h3>
+                    <p className="text-amber-200/80 leading-relaxed mb-3">
+                      On Day 1, you&apos;re assigned to one of three tribes. Each tribe starts with 6 players. 
+                      This is your family for the first phase of the game. Build relationships, contribute to camp, 
+                      and form alliances—but remember, only one person can win.
+                    </p>
+                    <p className="text-sm text-amber-300/60">
+                      Tribe assignments are random, but your archetype choice affects how you contribute to your tribe&apos;s success.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500">
+                <div className="flex items-start gap-6">
+                  <div className="text-4xl font-tribal font-bold text-orange-500 flex-shrink-0">3</div>
+                  <div>
+                    <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-3">Survive Daily Phases</h3>
+                    <p className="text-amber-200/80 leading-relaxed mb-3">
+                      Each day has three phases: Camp (6-8 hours), Challenge (6-8 hours), and Tribal Council (6-8 hours). 
+                      During Camp, forage, craft, trade, and strategize. During Challenge, compete for immunity. 
+                      At Tribal Council, vote someone out. One player eliminated per day until the merge.
+                    </p>
+                    <p className="text-sm text-amber-300/60">
+                      You don&apos;t need to be online for the full phase—just check in to take actions and vote.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500">
+                <div className="flex items-start gap-6">
+                  <div className="text-4xl font-tribal font-bold text-orange-500 flex-shrink-0">4</div>
+                  <div>
+                    <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-3">Merge & Face the Jury</h3>
+                    <p className="text-amber-200/80 leading-relaxed mb-3">
+                      When 11 players remain, tribes merge into one. The jury begins—every eliminated player after the merge 
+                      votes for the winner at Final Tribal Council. Build relationships, make big moves, and manage your reputation. 
+                      The jury remembers everything.
+                    </p>
+                    <p className="text-sm text-amber-300/60">
+                      Social game becomes even more critical. Every vote-out creates a potential jury member who will judge your game.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500">
+                <div className="flex items-start gap-6">
+                  <div className="text-4xl font-tribal font-bold text-orange-500 flex-shrink-0">5</div>
+                  <div>
+                    <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-3">Win Final Tribal Council</h3>
+                    <p className="text-amber-200/80 leading-relaxed mb-3">
+                      Final 4 compete in the last challenge. Winner picks 2 rivals for a 1v1 battle. Final 3 face the jury. 
+                      Make your case. Explain your strategy. Convince the jury you deserve the title of Sole Survivor. 
+                      The jury votes. One winner emerges.
+                    </p>
+                    <p className="text-sm text-amber-300/60">
+                      Your entire game is on display. Every move, every alliance, every vote is scrutinized. Make it count.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -513,23 +714,43 @@ export default function Home() {
               faqs={[
                 {
                   q: "Do I need to be online 24/7?",
-                  a: "No! Each phase lasts 6-8 hours. Check in once or twice per phase to take actions, chat with your tribe, and vote. Perfect for busy schedules.",
+                  a: "No! Each phase lasts 6-8 hours. Check in once or twice per phase to take actions, chat with your tribe, and vote. Perfect for busy schedules. You can set up push notifications to know when phases change or when important events happen.",
                 },
                 {
                   q: "How do alliances work?",
-                  a: "Use direct messages and tribe chat to form secret alliances. Coordinate votes, share resources, and plan blindsides. Trust is everything—and nothing.",
+                  a: "Use direct messages and tribe chat to form secret alliances. Coordinate votes, share resources, and plan blindsides. Trust is everything—and nothing. You can form multiple alliances, but be careful—players talk, and your reputation matters.",
                 },
                 {
                   q: "Can I play on my phone?",
-                  a: "Yes! It's a Progressive Web App (PWA). Works perfectly on mobile, tablet, and desktop. Install it to your home screen for the best experience.",
+                  a: "Yes! It's a Progressive Web App (PWA). Works perfectly on mobile, tablet, and desktop. Install it to your home screen for the best experience. Push notifications work on mobile too, so you'll never miss a phase change or important event.",
                 },
                 {
                   q: "What happens if I find an immunity idol?",
-                  a: "Hidden immunity idols are game-changers. Play one at tribal council to nullify all votes against you. Keep it secret or bluff about having one to manipulate votes.",
+                  a: "Hidden immunity idols are game-changers. Play one at tribal council to nullify all votes against you. Keep it secret or bluff about having one to manipulate votes. Idols can be found during camp phase by exploring or completing certain actions.",
                 },
                 {
                   q: "How many players per season?",
-                  a: "18 players divided into 3 tribes of 6. Tribes merge when 11 players remain. Every season is a fresh start with new players and new dynamics.",
+                  a: "18 players divided into 3 tribes of 6. Tribes merge when 11 players remain. Every season is a fresh start with new players and new dynamics. Each season typically lasts 4-5 real weeks.",
+                },
+                {
+                  q: "What are narrative arcs?",
+                  a: "Your actions throughout the game build your character's narrative arc. Track your progression through milestones (25%, 50%, 75%, 100%). Your arc type (hero, villain, wildcard, etc.) evolves based on your choices. This adds depth and storytelling to your game experience.",
+                },
+                {
+                  q: "How does crafting work?",
+                  a: "Discover recipes as you explore and complete actions. Use resources from your inventory to craft tools, weapons, and survival gear. Each crafted item provides strategic advantages. Recipes can be found through exploration, trading with other players, or completing projects.",
+                },
+                {
+                  q: "Can I trade with players from other tribes?",
+                  a: "After the merge, yes! Before the merge, you can only trade within your own tribe. Trading builds relationships but also reveals your resource situation—use it strategically. Fair trades build trust; unfair deals create enemies.",
+                },
+                {
+                  q: "What happens if I don't vote?",
+                  a: "If you don't vote during tribal council, you automatically vote for yourself. Always vote—even if you're safe with an idol, your vote can influence tie-breakers and jury perception.",
+                },
+                {
+                  q: "How do I win challenges?",
+                  a: "Challenges use provably fair commit-reveal RNG. Your archetype abilities, energy level, and stats affect your performance. Team challenges combine all tribe members' rolls. Individual challenges are based on your personal stats and abilities.",
                 },
               ]}
             />
