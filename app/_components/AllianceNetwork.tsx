@@ -165,4 +165,3 @@ export function AllianceNetwork({ seasonId, authorId }: AllianceNetworkProps) {
     </div>
   );
 }
-

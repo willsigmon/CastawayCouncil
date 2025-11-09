@@ -79,11 +79,10 @@ export default function AlliancesPage() {
             <button
               key={player.playerId}
               onClick={() => setSelectedPlayerId(selectedPlayerId === player.playerId ? null : player.playerId)}
-              className={`px-4 py-2 rounded border transition-colors ${
-                selectedPlayerId === player.playerId
+              className={`px-4 py-2 rounded border transition-colors ${selectedPlayerId === player.playerId
                   ? "bg-amber-600 border-amber-500 text-white"
                   : "bg-stone-800 border-stone-700 text-stone-300 hover:border-stone-600"
-              }`}
+                }`}
             >
               {player.playerName}
             </button>
@@ -132,4 +131,3 @@ export default function AlliancesPage() {
     </div>
   );
 }
-

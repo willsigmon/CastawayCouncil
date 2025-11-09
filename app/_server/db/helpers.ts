@@ -402,15 +402,15 @@ export async function triggerCampaignEvent(eventId: string, triggeredBy: string 
 }
 
 export async function getCampaignEvents(seasonId: string, filters?: { status?: "pending" | "triggered" | "all" }) {
-  let query = db.select().from(campaignEvents).where(eq(campaignEvents.seasonId, seasonId));
+  const conditions = [eq(campaignEvents.seasonId, seasonId)];
 
   if (filters?.status === "pending") {
-    query = query.where(and(eq(campaignEvents.seasonId, seasonId), isNull(campaignEvents.triggeredAt))) as any;
+    conditions.push(isNull(campaignEvents.triggeredAt));
   } else if (filters?.status === "triggered") {
-    query = query.where(and(eq(campaignEvents.seasonId, seasonId), gt(campaignEvents.triggeredAt, new Date(0)))) as any;
+    conditions.push(gt(campaignEvents.triggeredAt, new Date(0)));
   }
 
-  return await query.orderBy(desc(campaignEvents.createdAt));
+  return await db.select().from(campaignEvents).where(and(...conditions)).orderBy(desc(campaignEvents.createdAt));
 }
 
 async function getCurrentDayForSeason(seasonId: string): Promise<number> {

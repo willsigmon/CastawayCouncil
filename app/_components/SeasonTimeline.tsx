@@ -160,11 +160,10 @@ export function SeasonTimeline({ seasonId }: { seasonId: string }) {
         {events.map((event, i) => (
           <div
             key={i}
-            className={`flex items-center gap-4 p-3 rounded-lg border transition-all duration-300 ${
-              event.status === "current"
+            className={`flex items-center gap-4 p-3 rounded-lg border transition-all duration-300 ${event.status === "current"
                 ? "bg-amber-900/30 border-amber-500 shadow-lg shadow-amber-900/40"
                 : "bg-stone-900/20 border-stone-700 hover:border-stone-600"
-            }`}
+              }`}
           >
             <div className="text-2xl">
               {event.phase === "camp" && "⛺"}
@@ -196,9 +195,8 @@ export function SeasonTimeline({ seasonId }: { seasonId: string }) {
           {campaignEvents.map((event) => (
             <div
               key={event.id}
-              className={`flex items-center gap-4 p-3 rounded-lg border bg-purple-900/20 border-purple-700 hover:border-purple-600 ${
-                event.triggeredAt ? "opacity-60" : ""
-              }`}
+              className={`flex items-center gap-4 p-3 rounded-lg border bg-purple-900/20 border-purple-700 hover:border-purple-600 ${event.triggeredAt ? "opacity-60" : ""
+                }`}
             >
               <div className="text-xl">
                 {event.type === "storm" && "⛈️"}

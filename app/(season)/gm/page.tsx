@@ -229,41 +229,37 @@ export default function GMPage() {
       <div className="flex gap-2 mb-6 border-b border-stone-700">
         <button
           onClick={() => setActiveTab("events")}
-          className={`px-4 py-2 font-semibold transition-colors ${
-            activeTab === "events"
+          className={`px-4 py-2 font-semibold transition-colors ${activeTab === "events"
               ? "text-amber-400 border-b-2 border-amber-400"
               : "text-stone-400 hover:text-stone-200"
-          }`}
+            }`}
         >
           Campaign Events ({events.length})
         </button>
         <button
           onClick={() => setActiveTab("projects")}
-          className={`px-4 py-2 font-semibold transition-colors ${
-            activeTab === "projects"
+          className={`px-4 py-2 font-semibold transition-colors ${activeTab === "projects"
               ? "text-amber-400 border-b-2 border-amber-400"
               : "text-stone-400 hover:text-stone-200"
-          }`}
+            }`}
         >
           Projects ({projects.length})
         </button>
         <button
           onClick={() => setActiveTab("reveals")}
-          className={`px-4 py-2 font-semibold transition-colors ${
-            activeTab === "reveals"
+          className={`px-4 py-2 font-semibold transition-colors ${activeTab === "reveals"
               ? "text-amber-400 border-b-2 border-amber-400"
               : "text-stone-400 hover:text-stone-200"
-          }`}
+            }`}
         >
           Reveals ({reveals.length})
         </button>
         <button
           onClick={() => setActiveTab("analytics")}
-          className={`px-4 py-2 font-semibold transition-colors ${
-            activeTab === "analytics"
+          className={`px-4 py-2 font-semibold transition-colors ${activeTab === "analytics"
               ? "text-amber-400 border-b-2 border-amber-400"
               : "text-stone-400 hover:text-stone-200"
-          }`}
+            }`}
         >
           Analytics
         </button>
@@ -275,11 +271,10 @@ export default function GMPage() {
           {events.map((event) => (
             <div
               key={event.id}
-              className={`p-4 rounded-lg border ${
-                event.triggeredAt
+              className={`p-4 rounded-lg border ${event.triggeredAt
                   ? "bg-stone-800/30 border-stone-700 opacity-60"
                   : "bg-purple-900/20 border-purple-700 hover:border-purple-600"
-              }`}
+                }`}
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -338,13 +333,12 @@ export default function GMPage() {
                     <span className="text-xl">🔨</span>
                     <h3 className="font-bold text-blue-100">{project.name}</h3>
                     <span
-                      className={`px-2 py-1 text-xs font-bold rounded ${
-                        project.status === "active"
+                      className={`px-2 py-1 text-xs font-bold rounded ${project.status === "active"
                           ? "bg-blue-500/20 text-blue-300"
                           : project.status === "completed"
-                          ? "bg-green-500/20 text-green-300"
-                          : "bg-stone-500/20 text-stone-300"
-                      }`}
+                            ? "bg-green-500/20 text-green-300"
+                            : "bg-stone-500/20 text-stone-300"
+                        }`}
                     >
                       {project.status}
                     </span>
