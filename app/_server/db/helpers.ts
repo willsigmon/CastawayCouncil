@@ -380,15 +380,23 @@ export async function triggerCampaignEvent(eventId: string, triggeredBy: string 
   }
 
   // Emit push notification for campaign event
-  try {
-    const { emitPush } = await import("../../infra/temporal/activities");
-    await emitPush({
-      seasonId: event.seasonId,
-      type: "campaign_event",
-      campaignEventId: event.id,
-    });
-  } catch (error) {
-    console.error("Failed to emit push notification for campaign event:", error);
+  // Only import if available (infra directory may not be present in Vercel builds)
+  if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_TEMPORAL === 'true') {
+    try {
+      // Use dynamic import with a path that webpack can't statically analyze
+      const activitiesPath = '../../infra/temporal/activities';
+      const activities = await import(/* webpackIgnore: true */ activitiesPath);
+      if (activities?.emitPush) {
+        await activities.emitPush({
+          seasonId: event.seasonId,
+          type: "campaign_event",
+          campaignEventId: event.id,
+        });
+      }
+    } catch (error) {
+      // Silently fail if temporal activities aren't available
+      console.debug("Temporal activities not available:", error);
+    }
   }
 
   return event;
@@ -488,15 +496,23 @@ export async function contributeToProject(
     // TODO: Grant items if rewards.items exists
 
     // Emit push notification for project completion
-    try {
-      const { emitPush } = await import("../../infra/temporal/activities");
-      await emitPush({
-        seasonId: project.seasonId,
-        type: "project_completed",
-        projectId: project.id,
-      });
-    } catch (error) {
-      console.error("Failed to emit push notification for project completion:", error);
+    // Only import if available (infra directory may not be present in Vercel builds)
+    if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_TEMPORAL === 'true') {
+      try {
+        // Use dynamic import with a path that webpack can't statically analyze
+        const activitiesPath = '../../infra/temporal/activities';
+        const activities = await import(/* webpackIgnore: true */ activitiesPath);
+        if (activities?.emitPush) {
+          await activities.emitPush({
+            seasonId: project.seasonId,
+            type: "project_completed",
+            projectId: project.id,
+          });
+        }
+      } catch (error) {
+        // Silently fail if temporal activities aren't available
+        console.debug("Temporal activities not available:", error);
+      }
     }
   }
 
@@ -687,15 +703,23 @@ export async function revealContent(revealId: string, revealContentJson: Record<
     .returning();
 
   // Emit push notification for reveal
-  try {
-    const { emitPush } = await import("../../infra/temporal/activities");
-    await emitPush({
-      seasonId: reveal.seasonId,
-      type: "reveal_revealed",
-      revealId: reveal.id,
-    });
-  } catch (error) {
-    console.error("Failed to emit push notification for reveal:", error);
+  // Only import if available (infra directory may not be present in Vercel builds)
+  if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_TEMPORAL === 'true') {
+    try {
+      // Use dynamic import with a path that webpack can't statically analyze
+      const activitiesPath = '../../infra/temporal/activities';
+      const activities = await import(/* webpackIgnore: true */ activitiesPath);
+      if (activities?.emitPush) {
+        await activities.emitPush({
+          seasonId: reveal.seasonId,
+          type: "reveal_revealed",
+          revealId: reveal.id,
+        });
+      }
+    } catch (error) {
+      // Silently fail if temporal activities aren't available
+      console.debug("Temporal activities not available:", error);
+    }
   }
 
   return reveal;
