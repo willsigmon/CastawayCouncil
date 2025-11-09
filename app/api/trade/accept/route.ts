@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentPlayer } from "@/app/_server/auth";
 import { acceptTrade, rejectTrade } from "@/app/_server/db/helpers";
-import { TradeAcceptSchema } from "@schemas";
 import { handleApiError } from "@/app/_server/errors";
 
 export async function POST(req: NextRequest) {

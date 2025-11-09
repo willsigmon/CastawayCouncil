@@ -35,7 +35,7 @@ export function SeasonTimeline({ seasonId }: { seasonId: string }) {
   const [campaignEvents, setCampaignEvents] = useState<CampaignEvent[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
-  const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null);
+  const [, setDebounceTimer] = useState<NodeJS.Timeout | null>(null);
 
   const fetchTimeline = async () => {
     try {
@@ -139,6 +139,7 @@ export function SeasonTimeline({ seasonId }: { seasonId: string }) {
       // Silently fail if Supabase not configured
       console.error("Failed to set up campaign realtime subscription:", error);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seasonId]);
 
   if (loading) {

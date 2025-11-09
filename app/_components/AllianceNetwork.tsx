@@ -78,7 +78,7 @@ export function AllianceNetwork({ seasonId, authorId }: AllianceNetworkProps) {
     const radius = Math.min(canvas.width, canvas.height) * 0.35;
     const angleStep = (2 * Math.PI) / playerArray.length;
 
-    playerArray.forEach(([id, player], index) => {
+    playerArray.forEach(([_id, player], index) => {
       const angle = index * angleStep;
       player.x = centerX + radius * Math.cos(angle);
       player.y = centerY + radius * Math.sin(angle);
@@ -102,7 +102,7 @@ export function AllianceNetwork({ seasonId, authorId }: AllianceNetworkProps) {
     });
 
     // Draw players (nodes)
-    playerArray.forEach(([id, player]) => {
+    playerArray.forEach(([_id, player]) => {
       // Node circle
       ctx.fillStyle = "#1f2937";
       ctx.beginPath();

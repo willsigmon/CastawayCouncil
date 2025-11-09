@@ -123,6 +123,7 @@ export function CampaignEventFeed({
     } catch (error) {
       console.error("Failed to set up event feed realtime subscription:", error);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seasonId, filterType, filterDay, filterPhase]);
 
   const getEventIcon = (type: string) => {

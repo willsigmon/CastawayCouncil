@@ -19,9 +19,9 @@ interface PlayerRelationshipCardProps {
 }
 
 export function PlayerRelationshipCard({
-  playerId,
+  playerId: _playerId,
   playerName,
-  seasonId,
+  seasonId: _seasonId,
   relationships,
 }: PlayerRelationshipCardProps) {
   const trustCounts = {
@@ -33,7 +33,7 @@ export function PlayerRelationshipCard({
 
   return (
     <div className="p-4 bg-stone-800/50 rounded-lg border border-stone-700">
-      <h3 className="text-lg font-semibold text-stone-200 mb-4">{playerName}'s Relationships</h3>
+      <h3 className="text-lg font-semibold text-stone-200 mb-4">{playerName}&apos;s Relationships</h3>
 
       {/* Trust Distribution */}
       <div className="grid grid-cols-4 gap-2 mb-4">

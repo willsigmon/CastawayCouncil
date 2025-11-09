@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuth, getCurrentPlayer } from "@/app/_server/auth";
+import { getCurrentPlayer } from "@/app/_server/auth";
 import { ProjectContributionSchema } from "@schemas";
 import { contributeToProject } from "@/app/_server/db/helpers";
 import { ApiError } from "@/app/_server/errors";

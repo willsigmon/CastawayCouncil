@@ -13,7 +13,6 @@ import {
   resourceTransactions,
   reveals,
   narrativeArcs,
-  tribes,
   trades,
   craftingRecipes,
 } from "./schema";
@@ -394,7 +393,7 @@ export async function triggerCampaignEvent(eventId: string, triggeredBy: string 
         campaignEventId: event.id,
       });
     }
-  } catch (error) {
+  } catch (_error) {
     // Silently fail if temporal activities aren't available (expected in Vercel builds)
     // This is expected when infra/ directory is excluded by .vercelignore
   }
@@ -510,7 +509,7 @@ export async function contributeToProject(
           projectId: project.id,
         });
       }
-    } catch (error) {
+    } catch (_error) {
       // Silently fail if temporal activities aren't available (expected in Vercel builds)
       // This is expected when infra/ directory is excluded by .vercelignore
     }
@@ -520,7 +519,7 @@ export async function contributeToProject(
 }
 
 export async function getProjects(seasonId: string, filters?: { tribeId?: string; playerId?: string; status?: string }) {
-  let conditions = [eq(projects.seasonId, seasonId)];
+  const conditions = [eq(projects.seasonId, seasonId)];
 
   if (filters?.tribeId) {
     conditions.push(eq(projects.tribeId, filters.tribeId));
@@ -717,10 +716,10 @@ export async function revealContent(revealId: string, revealContentJson: Record<
         revealId: reveal.id,
       });
     }
-  } catch (error) {
-    // Silently fail if temporal activities aren't available (expected in Vercel builds)
-    // This is expected when infra/ directory is excluded by .vercelignore
-  }
+  } catch (_error) {
+      // Silently fail if temporal activities aren't available (expected in Vercel builds)
+      // This is expected when infra/ directory is excluded by .vercelignore
+    }
 
   return reveal;
 }

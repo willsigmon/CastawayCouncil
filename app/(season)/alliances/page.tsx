@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { AllianceNetwork } from "@/app/_components/AllianceNetwork";
 import { PlayerRelationshipCard } from "@/app/_components/PlayerRelationshipCard";
-import { TrustMeter } from "@/app/_components/TrustMeter";
 
 type Relationship = {
   authorId: string;

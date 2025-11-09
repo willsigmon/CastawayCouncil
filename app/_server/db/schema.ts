@@ -854,7 +854,7 @@ export const tradesRelations = relations(trades, ({ one }) => ({
   }),
 }));
 
-export const craftingRecipesRelations = relations(craftingRecipes, ({ one, many }) => ({
+export const craftingRecipesRelations = relations(craftingRecipes, ({ one }) => ({
   season: one(seasons, {
     fields: [craftingRecipes.seasonId],
     references: [seasons.id],

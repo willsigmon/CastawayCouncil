@@ -32,6 +32,7 @@ export function RevealManager({ seasonId }: RevealManagerProps) {
 
   useEffect(() => {
     fetchReveals();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seasonId]);
 
   const fetchReveals = async () => {

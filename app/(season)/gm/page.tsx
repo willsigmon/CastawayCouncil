@@ -44,7 +44,7 @@ export default function GMPage() {
   const [activeTab, setActiveTab] = useState<"events" | "projects" | "reveals" | "analytics">("events");
   const [showCreateEventModal, setShowCreateEventModal] = useState(false);
   const [showCreateProjectModal, setShowCreateProjectModal] = useState(false);
-  const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null);
+  const [, setDebounceTimer] = useState<NodeJS.Timeout | null>(null);
 
   const fetchData = async () => {
     try {
@@ -170,6 +170,7 @@ export default function GMPage() {
     } catch (error) {
       console.error("Failed to set up GM realtime subscription:", error);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seasonId]);
 
   const handleTriggerEvent = async (eventId: string) => {

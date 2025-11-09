@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireGM } from "@/app/_server/auth";
 import { GMTriggerEventSchema } from "@schemas";
-import { triggerCampaignEvent, getCampaignEvents } from "@/app/_server/db/helpers";
+import { triggerCampaignEvent } from "@/app/_server/db/helpers";
 import { ApiError } from "@/app/_server/errors";
 import { db } from "@/app/_server/db/client";
 import { campaignEvents } from "@/app/_server/db/schema";

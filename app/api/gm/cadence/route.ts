@@ -4,7 +4,7 @@ import { GMCadenceControlSchema } from "@schemas";
 import { ApiError } from "@/app/_server/errors";
 import { db } from "@/app/_server/db/client";
 import { seasons, events } from "@/app/_server/db/schema";
-import { eq, and, desc } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 export async function POST(request: NextRequest) {
   try {

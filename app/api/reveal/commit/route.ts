@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireGM } from "@/app/_server/auth";
 import { RevealCommitSchema } from "@schemas";
-import { commitReveal, getReveals } from "@/app/_server/db/helpers";
+import { commitReveal } from "@/app/_server/db/helpers";
 import { ApiError } from "@/app/_server/errors";
 import { db } from "@/app/_server/db/client";
 import { reveals } from "@/app/_server/db/schema";

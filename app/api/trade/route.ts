@@ -57,7 +57,6 @@ export async function DELETE(req: NextRequest) {
     }
 
     // Get trade to find seasonId
-    const { getTrades } = await import("@/app/_server/db/helpers");
     const { db } = await import("@/app/_server/db/client");
     const { trades } = await import("@/app/_server/db/schema");
     const { eq } = await import("drizzle-orm");

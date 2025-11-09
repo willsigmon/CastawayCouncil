@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentPlayer } from "@/app/_server/auth";
 import { db } from "@/app/_server/db/client";
-import { tribeMembers, players, tribes } from "@/app/_server/db/schema";
-import { eq, and } from "drizzle-orm";
+import { tribeMembers, players } from "@/app/_server/db/schema";
+import { eq } from "drizzle-orm";
 import { handleApiError } from "@/app/_server/errors";
 
 export async function GET(req: NextRequest) {
