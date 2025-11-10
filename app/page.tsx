@@ -340,13 +340,13 @@ export default function Home() {
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
                 <StaggerChildren delay={0.1}>
                   {/* Hunter */}
-                  <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/40 hover:border-orange-500 transition-all duration-500 hover:shadow-2xl hover:shadow-orange-900/50 hover:scale-105 hover:-translate-y-2 cursor-pointer group">
+                  <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-orange-500 transition-all duration-500 hover:shadow-2xl hover:shadow-orange-900/50 hover:scale-105 hover:-translate-y-2 cursor-pointer group flex flex-col h-full">
                     <div className="text-center mb-4">
                       <span className="text-6xl mb-3 block transition-transform duration-300 group-hover:scale-125 group-hover:rotate-12">🪓</span>
                       <h3 className="text-2xl font-tribal text-amber-100 font-bold group-hover:text-orange-400 transition-colors">The Hunter</h3>
                       <p className="text-sm text-amber-600 uppercase tracking-wide group-hover:text-amber-500 transition-colors">Provider / Resource Gatherer</p>
                     </div>
-                    <div className="space-y-4 text-sm">
+                    <div className="space-y-4 text-sm flex-grow">
                       <div>
                         <h4 className="text-orange-400 font-bold mb-2 uppercase tracking-wide">Abilities</h4>
                         <ul className="space-y-1 text-amber-200/80">
@@ -362,13 +362,13 @@ export default function Home() {
                   </div>
 
                   {/* Strategist */}
-                  <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/40 hover:border-purple-500 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-900/50 hover:scale-105 hover:-translate-y-2 cursor-pointer group">
+                  <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-purple-500 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-900/50 hover:scale-105 hover:-translate-y-2 cursor-pointer group flex flex-col h-full">
                     <div className="text-center mb-4">
                       <span className="text-6xl mb-3 block transition-transform duration-300 group-hover:scale-125">🧠</span>
                       <h3 className="text-2xl font-tribal text-amber-100 font-bold group-hover:text-purple-400 transition-colors">The Strategist</h3>
                       <p className="text-sm text-amber-600 uppercase tracking-wide group-hover:text-amber-500 transition-colors">Mastermind / Social Manipulator</p>
                     </div>
-                    <div className="space-y-4 text-sm">
+                    <div className="space-y-4 text-sm flex-grow">
                       <div>
                         <h4 className="text-orange-400 font-bold mb-2 uppercase tracking-wide">Abilities</h4>
                         <ul className="space-y-1 text-amber-200/80">
@@ -384,13 +384,13 @@ export default function Home() {
                   </div>
 
                   {/* Builder */}
-                  <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/40 hover:border-amber-500 transition-all duration-500 hover:shadow-2xl hover:shadow-amber-900/50 hover:scale-105 hover:-translate-y-2 cursor-pointer group">
+                  <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500 hover:shadow-2xl hover:shadow-amber-900/50 hover:scale-105 hover:-translate-y-2 cursor-pointer group flex flex-col h-full">
                     <div className="text-center mb-4">
                       <span className="text-6xl mb-3 block transition-transform duration-300 group-hover:scale-125 group-hover:rotate-12">💪</span>
                       <h3 className="text-2xl font-tribal text-amber-100 font-bold group-hover:text-amber-400 transition-colors">The Builder</h3>
                       <p className="text-sm text-amber-600 uppercase tracking-wide group-hover:text-amber-500 transition-colors">Camp Sustainer / Craftsman</p>
                     </div>
-                    <div className="space-y-4 text-sm">
+                    <div className="space-y-4 text-sm flex-grow">
                       <div>
                         <h4 className="text-orange-400 font-bold mb-2 uppercase tracking-wide">Abilities</h4>
                         <ul className="space-y-1 text-amber-200/80">
@@ -406,13 +406,13 @@ export default function Home() {
                   </div>
 
                   {/* Medic */}
-                  <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/40 hover:border-emerald-500 transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-900/50 hover:scale-105 hover:-translate-y-2 cursor-pointer group">
+                  <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-emerald-500 transition-all duration-500 hover:shadow-2xl hover:shadow-emerald-900/50 hover:scale-105 hover:-translate-y-2 cursor-pointer group flex flex-col h-full">
                     <div className="text-center mb-4">
                       <span className="text-6xl mb-3 block transition-transform duration-300 group-hover:scale-125">🩹</span>
                       <h3 className="text-2xl font-tribal text-amber-100 font-bold group-hover:text-emerald-400 transition-colors">The Medic</h3>
                       <p className="text-sm text-amber-600 uppercase tracking-wide group-hover:text-amber-500 transition-colors">Caregiver / Morale Booster</p>
                     </div>
-                    <div className="space-y-4 text-sm">
+                    <div className="space-y-4 text-sm flex-grow">
                       <div>
                         <h4 className="text-orange-400 font-bold mb-2 uppercase tracking-wide">Abilities</h4>
                         <ul className="space-y-1 text-amber-200/80">
@@ -428,13 +428,13 @@ export default function Home() {
                   </div>
 
                   {/* Leader */}
-                  <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/40 hover:border-red-500 transition-all duration-500 hover:shadow-2xl hover:shadow-red-900/50 hover:scale-105 hover:-translate-y-2 cursor-pointer group">
+                  <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-red-500 transition-all duration-500 hover:shadow-2xl hover:shadow-red-900/50 hover:scale-105 hover:-translate-y-2 cursor-pointer group flex flex-col h-full">
                     <div className="text-center mb-4">
                       <span className="text-6xl mb-3 block transition-transform duration-300 group-hover:scale-125 animate-pulse">🔥</span>
                       <h3 className="text-2xl font-tribal text-amber-100 font-bold group-hover:text-red-400 transition-colors">The Leader</h3>
                       <p className="text-sm text-amber-600 uppercase tracking-wide group-hover:text-amber-500 transition-colors">Motivator / Social Powerhouse</p>
                     </div>
-                    <div className="space-y-4 text-sm">
+                    <div className="space-y-4 text-sm flex-grow">
                       <div>
                         <h4 className="text-orange-400 font-bold mb-2 uppercase tracking-wide">Abilities</h4>
                         <ul className="space-y-1 text-amber-200/80">
@@ -450,13 +450,13 @@ export default function Home() {
                   </div>
 
                   {/* Scout */}
-                  <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/40 hover:border-cyan-500 transition-all duration-500 hover:shadow-2xl hover:shadow-cyan-900/50 hover:scale-105 hover:-translate-y-2 cursor-pointer group">
+                  <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-cyan-500 transition-all duration-500 hover:shadow-2xl hover:shadow-cyan-900/50 hover:scale-105 hover:-translate-y-2 cursor-pointer group flex flex-col h-full">
                     <div className="text-center mb-4">
                       <span className="text-6xl mb-3 block transition-transform duration-300 group-hover:scale-125">🗺️</span>
                       <h3 className="text-2xl font-tribal text-amber-100 font-bold group-hover:text-cyan-400 transition-colors">The Scout</h3>
                       <p className="text-sm text-amber-600 uppercase tracking-wide group-hover:text-amber-500 transition-colors">Observant / Explorer</p>
                     </div>
-                    <div className="space-y-4 text-sm">
+                    <div className="space-y-4 text-sm flex-grow">
                       <div>
                         <h4 className="text-orange-400 font-bold mb-2 uppercase tracking-wide">Abilities</h4>
                         <ul className="space-y-1 text-amber-200/80">
@@ -477,28 +477,33 @@ export default function Home() {
 
           {/* Current stats */}
           {publicStats && (
-            <div className="mb-24 border-t border-amber-900/30 pt-16">
-              <h2 className="text-3xl font-adventure text-amber-200 uppercase mb-12">The Numbers</h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <div className="text-center">
+            <div className="mb-24 border-t border-amber-900/30 pt-20">
+              <div className="text-center mb-16">
+                <h2 className="text-4xl font-adventure text-amber-200 uppercase mb-4 torch-glow">The Numbers</h2>
+                <p className="text-lg text-amber-300/80 max-w-3xl mx-auto">
+                  Real players. Real seasons. Real strategy.
+                </p>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
+                <div className="wood-panel rounded-lg p-6 text-center border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500 hover:shadow-xl hover:shadow-amber-900/40 hover:scale-105">
                   <div className="text-5xl font-tribal font-bold text-amber-100 mb-2">
                     <AnimatedCounter end={publicStats.activePlayers} formatValue={formatNumber} />
                   </div>
                   <div className="text-sm text-amber-600 uppercase tracking-wide font-tribal">Castaways</div>
                 </div>
-                <div className="text-center">
+                <div className="wood-panel rounded-lg p-6 text-center border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500 hover:shadow-xl hover:shadow-amber-900/40 hover:scale-105">
                   <div className="text-5xl font-tribal font-bold text-amber-100 mb-2">
                     <AnimatedCounter end={publicStats.totalSeasons} formatValue={formatNumber} />
                   </div>
                   <div className="text-sm text-amber-600 uppercase tracking-wide font-tribal">Seasons</div>
                 </div>
-                <div className="text-center">
+                <div className="wood-panel rounded-lg p-6 text-center border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500 hover:shadow-xl hover:shadow-amber-900/40 hover:scale-105">
                   <div className="text-5xl font-tribal font-bold text-amber-100 mb-2">
                     <AnimatedCounter end={publicStats.totalVotes} formatValue={formatNumber} />
                   </div>
                   <div className="text-sm text-amber-600 uppercase tracking-wide font-tribal">Votes Cast</div>
                 </div>
-                <div className="text-center">
+                <div className="wood-panel rounded-lg p-6 text-center border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500 hover:shadow-xl hover:shadow-amber-900/40 hover:scale-105">
                   <div className="text-5xl font-tribal font-bold text-amber-100 mb-2">
                     <AnimatedCounter end={publicStats.messagesToday} formatValue={formatNumber} />
                   </div>
@@ -510,14 +515,19 @@ export default function Home() {
 
           {/* Recent winners */}
           {winners.length > 0 && (
-            <div className="mb-24 border-t border-amber-900/30 pt-16">
-              <h2 className="text-3xl font-adventure text-amber-200 uppercase mb-8">Sole Survivors</h2>
-              <div className="wood-panel rounded-lg p-6">
+            <div className="mb-24 border-t border-amber-900/30 pt-20">
+              <div className="text-center mb-16">
+                <h2 className="text-4xl font-adventure text-amber-200 uppercase mb-4 torch-glow">Sole Survivors</h2>
+                <p className="text-lg text-amber-300/80 max-w-3xl mx-auto">
+                  Champions who outwitted, outplayed, and outlasted the competition
+                </p>
+              </div>
+              <div className="wood-panel rounded-lg p-8 max-w-4xl mx-auto border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500">
                 <div className="space-y-4">
                   {winners.map((champ) => (
-                    <div key={champ.seasonId} className="flex items-center justify-between py-3 border-b border-amber-900/30 last:border-0">
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl">👑</span>
+                    <div key={champ.seasonId} className="flex items-center justify-between py-4 px-4 border-b border-amber-900/30 last:border-0 hover:bg-amber-950/20 transition-colors rounded-lg">
+                      <div className="flex items-center gap-4">
+                        <span className="text-3xl">👑</span>
                         <div>
                           <div className="text-amber-100 font-bold text-lg">{champ.winnerDisplayName}</div>
                           {champ.tribeName && (
@@ -525,7 +535,7 @@ export default function Home() {
                           )}
                         </div>
                       </div>
-                      <div className="text-amber-700 text-sm font-tribal font-bold">{champ.seasonName}</div>
+                      <div className="text-amber-700 text-base font-tribal font-bold">{champ.seasonName}</div>
                     </div>
                   ))}
                 </div>
@@ -655,10 +665,10 @@ export default function Home() {
               </p>
             </div>
             <div className="max-w-5xl mx-auto space-y-6">
-              <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500">
+              <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500 hover:shadow-xl hover:shadow-amber-900/40 hover:scale-[1.02]">
                 <div className="flex items-start gap-6">
-                  <div className="text-4xl font-tribal font-bold text-orange-500 flex-shrink-0">1</div>
-                  <div>
+                  <div className="text-5xl font-tribal font-bold text-orange-500 flex-shrink-0 w-16 h-16 flex items-center justify-center rounded-full bg-orange-500/10 border-2 border-orange-500/30">1</div>
+                  <div className="flex-grow">
                     <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-3">Apply & Get Cast</h3>
                     <p className="text-amber-200/80 leading-relaxed mb-3">
                       Answer five detailed prompts about your strategy, personality, and goals. Multi-sentence answers land on the shortlist.
@@ -671,10 +681,10 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500">
+              <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500 hover:shadow-xl hover:shadow-amber-900/40 hover:scale-[1.02]">
                 <div className="flex items-start gap-6">
-                  <div className="text-4xl font-tribal font-bold text-orange-500 flex-shrink-0">2</div>
-                  <div>
+                  <div className="text-5xl font-tribal font-bold text-orange-500 flex-shrink-0 w-16 h-16 flex items-center justify-center rounded-full bg-orange-500/10 border-2 border-orange-500/30">2</div>
+                  <div className="flex-grow">
                     <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-3">Join Your Tribe</h3>
                     <p className="text-amber-200/80 leading-relaxed mb-3">
                       On Day 1, you&apos;re assigned to one of three tribes. Each tribe starts with 6 players.
@@ -688,10 +698,10 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500">
+              <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500 hover:shadow-xl hover:shadow-amber-900/40 hover:scale-[1.02]">
                 <div className="flex items-start gap-6">
-                  <div className="text-4xl font-tribal font-bold text-orange-500 flex-shrink-0">3</div>
-                  <div>
+                  <div className="text-5xl font-tribal font-bold text-orange-500 flex-shrink-0 w-16 h-16 flex items-center justify-center rounded-full bg-orange-500/10 border-2 border-orange-500/30">3</div>
+                  <div className="flex-grow">
                     <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-3">Survive Daily Phases</h3>
                     <p className="text-amber-200/80 leading-relaxed mb-3">
                       Each day has three phases: Camp (6-8 hours), Challenge (6-8 hours), and Tribal Council (6-8 hours).
@@ -705,10 +715,10 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500">
+              <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500 hover:shadow-xl hover:shadow-amber-900/40 hover:scale-[1.02]">
                 <div className="flex items-start gap-6">
-                  <div className="text-4xl font-tribal font-bold text-orange-500 flex-shrink-0">4</div>
-                  <div>
+                  <div className="text-5xl font-tribal font-bold text-orange-500 flex-shrink-0 w-16 h-16 flex items-center justify-center rounded-full bg-orange-500/10 border-2 border-orange-500/30">4</div>
+                  <div className="flex-grow">
                     <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-3">Merge & Face the Jury</h3>
                     <p className="text-amber-200/80 leading-relaxed mb-3">
                       When 11 players remain, tribes merge into one. The jury begins—every eliminated player after the merge
@@ -722,10 +732,10 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500">
+              <div className="wood-panel rounded-lg p-8 border-2 border-amber-700/30 hover:border-amber-500 transition-all duration-500 hover:shadow-xl hover:shadow-amber-900/40 hover:scale-[1.02]">
                 <div className="flex items-start gap-6">
-                  <div className="text-4xl font-tribal font-bold text-orange-500 flex-shrink-0">5</div>
-                  <div>
+                  <div className="text-5xl font-tribal font-bold text-orange-500 flex-shrink-0 w-16 h-16 flex items-center justify-center rounded-full bg-orange-500/10 border-2 border-orange-500/30">5</div>
+                  <div className="flex-grow">
                     <h3 className="text-2xl font-tribal text-amber-100 font-bold mb-3">Win Final Tribal Council</h3>
                     <p className="text-amber-200/80 leading-relaxed mb-3">
                       Final 4 compete in the last challenge. Winner picks 2 rivals for a 1v1 battle. Final 3 face the jury.
