@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import { createClient } from "@/app/_lib/supabase/client";
 import type { RealtimeChannel } from "@supabase/supabase-js";
+import { Button } from "./Button";
+import { Input } from "./Input";
 
 interface Message {
   id: string;
@@ -179,38 +181,39 @@ export function Chat({ channelType, seasonId, tribeId, toPlayerId }: ChatProps) 
         aria-label="Chat messages"
       >
         {messagesList.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">No messages yet. Start the conversation!</p>
+          <p className="text-amber-200/50 text-center py-8">No messages yet. Start the conversation!</p>
         ) : (
           messagesList.map((msg) => (
-            <div key={msg.id} className="p-2 rounded bg-gray-800">
+            <div key={msg.id} className="p-3 rounded-lg glass">
               <div className="flex items-center gap-2 mb-1">
-                <span className="font-semibold">{msg.fromPlayerName}</span>
-                <span className="text-xs text-gray-400">
-                  {new Date(msg.createdAt).toLocaleTimeString()}
+                <span className="font-semibold text-amber-200">{msg.fromPlayerName}</span>
+                <span className="text-xs text-amber-400/60">
+                  {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </span>
               </div>
-              <p>{msg.body}</p>
+              <p className="text-amber-50">{msg.body}</p>
             </div>
           ))
         )}
         <div ref={messagesEndRef} />
       </div>
-      <div className="p-4 border-t flex gap-2">
-        <input
+      <div className="p-4 border-t border-amber-900/40 flex gap-2">
+        <Input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && sendMessage()}
           placeholder="Type a message..."
-          className="flex-1 px-3 py-2 bg-gray-800 rounded"
           aria-label="Message input"
+          className="flex-1"
         />
-        <button
+        <Button
           onClick={sendMessage}
-          className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700"
+          variant="primary"
+          size="md"
         >
           Send
-        </button>
+        </Button>
       </div>
     </div>
   );
